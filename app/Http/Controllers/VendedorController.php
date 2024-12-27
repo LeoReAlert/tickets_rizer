@@ -11,7 +11,7 @@ class VendedorController extends Controller
 
     public function index()
     {
-        $vendedores = Vendedor::all(); // Pode ser ajustado para paginação
+        $vendedores = Vendedor::all();
         return view('vendedores.index', compact('vendedores'));
     }
 
