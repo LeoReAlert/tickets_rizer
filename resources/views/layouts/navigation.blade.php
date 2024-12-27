@@ -4,7 +4,7 @@
         <a class="navbar-brand" href="{{ route('dashboard') }}">
             <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
         </a>
-        <button class="btn btn-light" type="button" aria-expanded="false">
+        <button class="btn btn-light" onclick="window.location.href='{{ route('dashboard') }}'" type="button">
             Painel
         </button>
         @role('support')

@@ -13,14 +13,16 @@ return new class extends Migration
     {
         Schema::create('vendedores', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('nome');
-            $table->string('email')->unique();
             $table->string('telefone');
             $table->enum('status', ['Ativo', 'Inativo'])->default('Ativo');
             $table->integer('tickets_abertos')->default(0);
             $table->integer('tickets_em_andamento')->default(0);
             $table->integer('tickets_resolvidos')->default(0);
             $table->timestamps();
+
+            $table->index('status');
         });
     }
 

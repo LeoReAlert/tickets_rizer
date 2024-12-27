@@ -1,0 +1,94 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Ticket;
+use App\Models\Vendedor;
+use Illuminate\Http\Request;
+
+class TicketController extends Controller
+{
+
+    public function index()
+    {
+        $tickets = Ticket::all();
+        return view('tickets.index', compact('tickets'));
+    }
+
+
+    public function create()
+    {
+        $vendedores = Vendedor::all();
+        return view('tickets.create', compact('vendedores'));
+    }
+
+
+    public function store(Request $request)
+    {
+
+        $request->validate([
+            'assunto' => 'required|string|max:255',
+            'descricao' => 'required|string',
+        ]);
+
+
+        $vendedor = Vendedor::where('status', 'Ativo')
+            ->orderByRaw('tickets_abertos + tickets_em_andamento + tickets_resolvidos ASC')
+            ->first();
+
+        if ($vendedor) {
+
+            $ticket = new Ticket([
+                'assunto' => $request->assunto,
+                'descricao' => $request->descricao,
+                'vendedor_id' => $vendedor->id,
+                'status' => 'Aberto',
+            ]);
+
+            $ticket->save();
+
+
+            $vendedor->increment('tickets_abertos');
+
+            return redirect()->route('tickets.index')->with('success', 'Ticket criado e atribuído ao vendedor com menos tickets!');
+        }
+
+        return back()->with('error', 'Nenhum vendedor ativo disponível para atribuição.');
+    }
+
+
+
+    public function show(Ticket $ticket)
+    {
+        return view('tickets.show', compact('ticket'));
+    }
+
+
+    public function edit(Ticket $ticket)
+    {
+        $vendedores = Vendedor::all();
+        return view('tickets.edit', compact('ticket', 'vendedores'));
+    }
+
+
+    public function update(Request $request, Ticket $ticket)
+    {
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'descricao' => 'required|string',
+            'status' => 'required|string|in:Aberto,Em andamento,Resolvido',
+            'vendedor_id' => 'required|exists:vendedores,id',
+        ]);
+
+        $ticket->update($request->all());
+
+        return redirect()->route('tickets.index')->with('success', 'Ticket atualizado com sucesso!');
+    }
+
+    public function destroy(Ticket $ticket)
+    {
+        $ticket->delete();
+
+        return redirect()->route('tickets.index')->with('success', 'Ticket deletado com sucesso!');
+    }
+}
