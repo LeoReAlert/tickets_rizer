@@ -13,6 +13,8 @@ class Vendedor extends Model
         'user_id', 'nome', 'telefone', 'status', 'tickets_abertos', 'tickets_em_andamento', 'tickets_resolvidos'
     ];
 
+    protected $table = 'vendedores';
+
 
     public function user()
     {

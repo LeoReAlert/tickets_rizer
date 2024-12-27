@@ -11,13 +11,13 @@ class TicketController extends Controller
     public function index()
     {
         $tickets = Ticket::all();
-        return view('tickets.index', compact('tickets'));
+        return view('admin.tickets.index', compact('tickets'));
     }
 
     public function create()
     {
         $vendedores = Vendedor::all();
-        return view('tickets.create', compact('vendedores'));
+        return view('admin.tickets.create', compact('vendedores'));
     }
 
     public function store(Request $request)
@@ -42,7 +42,7 @@ class TicketController extends Controller
             ]);
 
 
-            $vendedor->increment('tickets_abertos');
+            $vendedor->increment('admin.tickets_abertos');
 
 
             return redirect()->route('tickets.index')->with('success', 'Ticket criado e atribuído ao vendedor com menos tickets!');
@@ -53,13 +53,13 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket)
     {
-        return view('tickets.show', compact('ticket'));
+        return view('admin.tickets.show', compact('ticket'));
     }
 
     public function edit(Ticket $ticket)
     {
         $vendedores = Vendedor::all();
-        return view('tickets.edit', compact('ticket', 'vendedores'));
+        return view('admin.tickets.edit', compact('ticket', 'vendedores'));
     }
 
     public function update(Request $request, Ticket $ticket)
@@ -76,13 +76,13 @@ class TicketController extends Controller
         $ticket->update($request->all());
 
 
-        return redirect()->route('tickets.index')->with('success', 'Ticket atualizado com sucesso!');
+        return redirect()->route('admin.tickets.index')->with('success', 'Ticket atualizado com sucesso!');
     }
 
     public function destroy(Ticket $ticket)
     {
         $ticket->delete();
 
-        return redirect()->route('tickets.index')->with('success', 'Ticket deletado com sucesso!');
+        return redirect()->route('admin.tickets.index')->with('success', 'Ticket deletado com sucesso!');
     }
 }

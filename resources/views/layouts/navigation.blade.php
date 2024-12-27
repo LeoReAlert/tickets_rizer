@@ -28,11 +28,15 @@
                     Tickets
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="ticketsDropdown">
-                    <li><a class="dropdown-item" href="#">Cadastrar Ticket</a></li>
-                    <li><a class="dropdown-item" href="#">Listar Tickets</a></li>
+                    <!-- Rota para o formulário de criação de ticket -->
+                    <li><a class="dropdown-item" href="{{ route('tickets.create') }}">Cadastrar Ticket</a></li>
+
+                    <!-- Rota para listar os tickets -->
+                    <li><a class="dropdown-item" href="{{ route('tickets.index') }}">Listar Tickets</a></li>
                 </ul>
             </div>
         @endhasrole
+
         <!-- Mobile Hamburger Button -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

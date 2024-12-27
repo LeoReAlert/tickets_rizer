@@ -1,6 +1,14 @@
-<h3>Ticket: {{ $ticket->titulo }}</h3>
-<p><strong>Descrição:</strong> {{ $ticket->descricao }}</p>
-<p><strong>Status:</strong> {{ $ticket->statusLabel() }}</p>
-<p><strong>Vendedor:</strong> {{ $ticket->vendedor->nome }}</p>
-<p><strong>Data de Criação:</strong> {{ $ticket->created_at }}</p>
-<p><strong>Data de Atualização:</strong> {{ $ticket->updated_at }}</p>
+<x-app-layout>
+    <x-slot name="header">
+        <h1>Detalhes do Ticket</h1>
+    </x-slot>
+
+    <div class="container mt-5">
+        <h3>{{ $ticket->assunto }}</h3>
+        <p>{{ $ticket->descricao }}</p>
+        <p>Status: {{ $ticket->status }}</p>
+        <p>Vendedor: {{ $ticket->vendedor->nome }}</p>
+
+        <a href="{{ route('tickets.index') }}" class="btn btn-secondary">Voltar</a>
+    </div>
+</x-app-layout>
