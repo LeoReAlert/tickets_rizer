@@ -46,7 +46,7 @@ Este é um projeto Laravel para Rizer abaixo estão as instruções para configu
 
    4. **Popular banco com seeed**
 
-   No terminal rodar seeders isso criar as permissões e usuários:
+   No terminal rodar seeders isso vai criar as permissões e usuários:
 
    ```bash
     php artisan db:seed
