@@ -18,7 +18,7 @@
         </div>
     @endif
 
-    <div class="container mt-5">
+    <div class="container mt-5 mb-2">
         <form action="{{ route('tickets.update', $ticket) }}" method="POST">
             @csrf
             @method('PUT')
@@ -31,6 +31,23 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+
+            <div class="mb-3">
+                <label for="suporte_id" class="form-label">Suporte</label>
+                <select class="form-select" id="suporte_id" name="suporte_id">
+                    <option value="">Selecione o suporte</option>
+                    @foreach ($suportes as $suporte)
+                        <option value="{{ $suporte->id }}"
+                            {{ $suporte->id == old('suporte_id', $ticket->suporte_id) ? 'selected' : '' }}>
+                            {{ $suporte->name }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('suporte_id')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
 
             <div class="mb-3">
                 <label for="descricao" class="form-label">Descrição</label>
