@@ -11,12 +11,20 @@ Este é um projeto Laravel para Rizer abaixo estão as instruções para configu
 
 ## Instalação
 
+   0. **Roda composer instalar pacotes**
+
+   No terminal rodar o camando para instalar pacotes:
+
+   ```bash
+     composer install --no-dev ou composer install
+   ```
+
    1. **Clone o repositório**
 
    Primeiro, clone o repositório do GitHub para a sua máquina local:
 
    ```bash
-   git clone https://github.com/LeoReAlert/tickets_rizer/edit/main/README.md
+   git clone https://github.com/LeoReAlert/tickets_rizer
 
    ```
 
@@ -44,11 +52,5 @@ Este é um projeto Laravel para Rizer abaixo estão as instruções para configu
     php artisan db:seed
    ```
 
-   5. **Roda composer instalar pacotes**
 
-   No terminal rodar o camando para instalar pacotes:
-
-   ```bash
-     composer install --no-dev ou composer install
-   ```
    
