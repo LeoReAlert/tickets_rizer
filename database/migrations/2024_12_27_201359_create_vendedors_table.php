@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('nome');
+            $table->string('email')->unique();
             $table->string('telefone');
             $table->enum('status', ['Ativo', 'Inativo'])->default('Ativo');
             $table->integer('tickets_abertos')->default(0);
@@ -24,6 +25,7 @@ return new class extends Migration
 
             $table->index('status');
         });
+
     }
 
     /**

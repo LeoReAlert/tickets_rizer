@@ -4,26 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Vendedor;
 
 class Ticket extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['titulo', 'descricao', 'status', 'vendedor_id'];
+    protected $fillable = ['titulo', 'descricao', 'status', 'vendedor_id', 'suporte_id'];
 
     public function vendedor()
     {
-        return $this->belongsTo(Vendedor::class);
+        return $this->belongsTo(User::class, 'vendedor_id');
+    }
+
+    public function suporte()
+    {
+    return $this->belongsTo(User::class, 'suporte_id');
     }
 
     public function statusLabel()
     {
         $statusLabels = [
-            'Aberto' => 'Aberto',
-            'Em andamento' => 'Em andamento',
-            'Resolvido' => 'Resolvido',
+            'ABERTO' => 'Aberto',
+            'EM ANDAMENTO' => 'Em andamento',
+            'RESOLVIDO' => 'Resolvido',
         ];
 
-        return $statusLabels[$this->status] ?? 'Desconhecido';
+        return $statusLabels[strtoupper($this->status)] ?? 'Desconhecido';
     }
+
 }

@@ -5,51 +5,64 @@ namespace App\Http\Controllers;
 use App\Models\Ticket;
 use App\Models\Vendedor;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class TicketController extends Controller
 {
     public function index()
     {
-        $tickets = Ticket::all();
-        return view('admin.tickets.index', compact('tickets'));
+        $user = auth()->user();
+        $ticketsQuery = Ticket::with('vendedor');
+
+        if ($user->hasRole('vendedor')) {
+            $ticketsQuery->where('vendedor_id', $user->id);
+        }
+
+        // Clona a query para verificar tickets abertos há mais de 24 horas
+        $ticketsAbertosMaisDe24Horas = (clone $ticketsQuery)
+            ->where('status', 'aberto')
+            ->where('created_at', '<', now()->subHours(24))
+            ->exists();
+
+        // Paginação sem os filtros adicionais
+        $tickets = $ticketsQuery->paginate(3);
+
+        return view('admin.tickets.index', compact('tickets', 'ticketsAbertosMaisDe24Horas'));
     }
+
 
     public function create()
     {
-        $vendedores = Vendedor::all();
+        $vendedores = Vendedor::where('status', 'Ativo')->get();
         return view('admin.tickets.create', compact('vendedores'));
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'assunto' => 'required|string|max:255',
-            'descricao' => 'required|string',
-        ]);
+{
+    $validated = $request->validate([
+        'assunto' => 'required|string|max:255',
+        'descricao' => 'required|string',
+        'status' => 'required|string',
+    ]);
 
 
-        $vendedor = Vendedor::where('status', 'Ativo')
-            ->orderByRaw('tickets_abertos + tickets_em_andamento + tickets_resolvidos ASC') // Ordena os vendedores pelo total de tickets
-            ->first();
+    $suporte = User::role('support')->first();
 
-        if ($vendedor) {
-
-            $ticket = Ticket::create([
-                'assunto' => $request->assunto,
-                'descricao' => $request->descricao,
-                'vendedor_id' => $vendedor->id,
-                'status' => 'Aberto',
-            ]);
-
-
-            $vendedor->increment('admin.tickets_abertos');
-
-
-            return redirect()->route('tickets.index')->with('success', 'Ticket criado e atribuído ao vendedor com menos tickets!');
-        }
-
-        return back()->with('error', 'Nenhum vendedor ativo disponível para atribuição.');
+    if (!$suporte) {
+        return back()->with('error', 'Nenhum suporte disponível para atribuição.');
     }
+
+
+    $ticket = Ticket::create([
+        'assunto' => $validated['assunto'],
+        'descricao' => $validated['descricao'],
+        'status' => $validated['status'],
+        'vendedor_id' => auth()->user()->id,
+        'suporte_id' => $suporte->id,
+    ]);
+
+    return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso!');
+}
 
     public function show(Ticket $ticket)
     {
@@ -58,13 +71,12 @@ class TicketController extends Controller
 
     public function edit(Ticket $ticket)
     {
-        $vendedores = Vendedor::all();
+        $vendedores = Vendedor::where('status', 'Ativo')->get(); // Apenas vendedores ativos
         return view('admin.tickets.edit', compact('ticket', 'vendedores'));
     }
 
     public function update(Request $request, Ticket $ticket)
     {
-
         $request->validate([
             'assunto' => 'required|string|max:255',
             'descricao' => 'required|string',
@@ -72,17 +84,14 @@ class TicketController extends Controller
             'vendedor_id' => 'required|exists:vendedores,id',
         ]);
 
+        $ticket->update($request->only('assunto', 'descricao', 'status', 'vendedor_id'));
 
-        $ticket->update($request->all());
-
-
-        return redirect()->route('admin.tickets.index')->with('success', 'Ticket atualizado com sucesso!');
+        return redirect()->route('tickets.index')->with('success', 'Ticket atualizado com sucesso!');
     }
 
     public function destroy(Ticket $ticket)
     {
         $ticket->delete();
-
-        return redirect()->route('admin.tickets.index')->with('success', 'Ticket deletado com sucesso!');
+        return redirect()->route('tickets.index')->with('success', 'Ticket deletado com sucesso!');
     }
 }

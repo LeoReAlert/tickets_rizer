@@ -15,8 +15,8 @@
                     Vendedores
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="vendedoresDropdown">
-                    <li><a class="dropdown-item" href="#">Cadastrar Vendedor</a></li>
-                    <li><a class="dropdown-item" href="#">Listar Vendedores</a></li>
+                    <li><a class="dropdown-item" href="{{ route('vendedores.create') }}">Cadastrar Vendedor</a></li>
+                    <li><a class="dropdown-item" href="{{ route('vendedores.index') }}">Listar Vendedores</a></li>
                 </ul>
             </div>
         @endrole
@@ -45,7 +45,7 @@
 
         <!-- Navbar Links -->
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav" style="margin-left:80%;">
                 <!-- Settings Dropdown -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
@@ -53,11 +53,10 @@
                         {{ Auth::user()->name }}
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="#">Perfil</a></li>
                         <li>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button class="dropdown-item" type="submit">{{ __('Log Out') }}</button>
+                                <button class="dropdown-item" type="submit">{{ __('Sair') }}</button>
                             </form>
                         </li>
                     </ul>
