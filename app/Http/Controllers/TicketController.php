@@ -10,26 +10,30 @@ use App\Models\User;
 class TicketController extends Controller
 {
     public function index()
-    {
-        $user = auth()->user();
-        $ticketsQuery = Ticket::with('vendedor');
+{
+    $user = auth()->user();
+    $ticketsQuery = Ticket::with('vendedor');
 
-        if ($user->hasRole('vendedor')) {
-            $ticketsQuery->where('vendedor_id', $user->id);
-        }
-
-        // Clona a query para verificar tickets abertos há mais de 24 horas
-        $ticketsAbertosMaisDe24Horas = (clone $ticketsQuery)
-            ->where('status', 'aberto')
-            ->where('created_at', '<', now()->subHours(24))
-            ->exists();
-
-        // Paginação sem os filtros adicionais
-        $tickets = $ticketsQuery->paginate(3);
-
-        return view('admin.tickets.index', compact('tickets', 'ticketsAbertosMaisDe24Horas'));
+    if ($user->hasRole('vendedor')) {
+        $ticketsQuery->where('vendedor_id', $user->id);
     }
 
+
+    $ticketsAbertosMaisDe24Horas = (clone $ticketsQuery)
+        ->where('status', 'aberto')
+        ->where('created_at', '<', now()->subHours(24))
+        ->exists();
+
+
+    $ticketsAtrasados = (clone $ticketsQuery)
+        ->where('status', 'aberto')
+        ->where('created_at', '<', now()->subHours(24))
+        ->get();
+
+    $tickets = $ticketsQuery->paginate(3);
+
+    return view('admin.tickets.index', compact('tickets', 'ticketsAbertosMaisDe24Horas', 'ticketsAtrasados'));
+}
 
     public function create()
     {

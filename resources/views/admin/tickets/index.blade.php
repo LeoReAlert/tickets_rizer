@@ -3,7 +3,13 @@
         <h1>Tickets</h1>
     </x-slot>
 
-    <!-- Alerta para tickets abertos há mais de 24 horas -->
+    @if ($ticketsAtrasados)
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Atenção!</strong> Existem tickets com status "Atrasado" que precisam ser resolvidos imediatamente.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     @if ($ticketsAbertosMaisDe24Horas)
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             <strong>Atenção!</strong> Existem tickets abertos há mais de 24 horas que requerem atenção.

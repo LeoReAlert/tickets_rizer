@@ -28,6 +28,7 @@ class Ticket extends Model
             'ABERTO' => 'Aberto',
             'EM ANDAMENTO' => 'Em andamento',
             'RESOLVIDO' => 'Resolvido',
+            'ATRASADO' => 'Atrasado',
         ];
 
         return $statusLabels[strtoupper($this->status)] ?? 'Desconhecido';
