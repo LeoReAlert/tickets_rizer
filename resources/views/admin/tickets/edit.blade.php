@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h1>Editar Ticket</h1>
+        <h1>Atualizar Ticket</h1>
     </x-slot>
 
     @if (session('success'))
@@ -18,10 +18,10 @@
         </div>
     @endif
 
-    <div class="container mt-5 mb-2">
-        <form action="{{ route('tickets.update', $ticket) }}" method="POST">
+    <div class="container mt-5">
+        <form action="{{ route('tickets.update', $ticket->id) }}" method="POST">
             @csrf
-            @method('PUT')
+            @method('put')
 
             <div class="mb-3">
                 <label for="assunto" class="form-label">Assunto</label>
@@ -31,23 +31,6 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
-
-            <div class="mb-3">
-                <label for="suporte_id" class="form-label">Suporte</label>
-                <select class="form-select" id="suporte_id" name="suporte_id">
-                    <option value="">Selecione o suporte</option>
-                    @foreach ($suportes as $suporte)
-                        <option value="{{ $suporte->id }}"
-                            {{ $suporte->id == old('suporte_id', $ticket->suporte_id) ? 'selected' : '' }}>
-                            {{ $suporte->name }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('suporte_id')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-
 
             <div class="mb-3">
                 <label for="descricao" class="form-label">Descrição</label>
@@ -60,18 +43,26 @@
 
             <div class="mb-3">
                 <label for="status" class="form-label">Status</label>
-                <select class="form-select @error('status') is-invalid @enderror" id="status" name="status"
+                <select class="form-control @error('status') is-invalid @enderror" id="status" name="status"
                     required>
-                    <option value="Aberto" @if ($ticket->status == 'Aberto') selected @endif>Aberto</option>
-                    <option value="Em andamento" @if ($ticket->status == 'Em andamento') selected @endif>Em andamento</option>
-                    <option value="Resolvido" @if ($ticket->status == 'Resolvido') selected @endif>Resolvido</option>
+                    <option value="">Selecione o status</option>
+                    <option value="Aberto" {{ old('status', $ticket->status) == 'Aberto' ? 'selected' : '' }}>Aberto
+                    </option>
+                    <option value="Em andamento"
+                        {{ old('status', $ticket->status) == 'Em andamento' ? 'selected' : '' }}>Em Andamento</option>
+                    <option value="Atrasado" {{ old('status', $ticket->status) == 'Atrasado' ? 'selected' : '' }}>
+                        Atrasado</option>
+                    <option value="Resolvido" {{ old('status', $ticket->status) == 'Resolvido' ? 'selected' : '' }}>
+                        Resolvido</option>
                 </select>
                 @error('status')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
-            <button type="submit" class="btn btn-warning">Atualizar Ticket</button>
+            <input type="hidden" name="vendedor_id" value="{{ auth()->user()->id }}">
+
+            <button type="submit" class="btn btn-primary">Atualizar Ticket</button>
         </form>
     </div>
 </x-app-layout>

@@ -82,30 +82,23 @@ class TicketController extends Controller
 
     public function update(Request $request, Ticket $ticket)
     {
-        $request->validate([
-            'assunto' => 'required|string|max:255',
-            'descricao' => 'required|string',
-            'status' => 'required|string|in:Aberto,Em andamento,Resolvido',
-            'vendedor_id' => 'required|exists:vendedores,id',
-            'suporte_id' => 'nullable|exists:users,id',
-        ]);
 
-        if ($request->has('suporte_id')) {
-            $ticket->suporte_id = $request->input('suporte_id');
-        }
+    $request->merge([
+        'status' => strtolower($request->status),
+    ]);
 
-        $ticket->update([
-            'assunto' => $request->input('assunto'),
-            'descricao' => $request->input('descricao'),
-            'status' => $request->input('status'),
-            'vendedor_id' => $request->input('vendedor_id'),
-            'suporte_id' => $ticket->suporte_id,
-        ]);
+    $validated = $request->validate([
+        'assunto' => 'required|string|max:255',
+        'descricao' => 'required|string',
+        'status' => 'required|string|in:aberto,em andamento,resolvido,atrasado',  // Aceitando minúsculas
+        'vendedor_id' => 'required|exists:vendedores,id',
+        'suporte_id' => 'nullable|exists:users,id',
+    ]);
 
+    $ticket->update($validated);
 
-        return redirect()->route('tickets.index')->with('success', 'Ticket atualizado com sucesso!');
+    return redirect()->route('tickets.index')->with('success', 'Ticket atualizado com sucesso!');
     }
-
 
 
     public function destroy(Ticket $ticket)
