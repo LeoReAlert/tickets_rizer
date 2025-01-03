@@ -72,11 +72,6 @@ class TicketController extends Controller
             return back()->with('error', 'Vendedor não encontrado no sistema.');
         }
         
-       
-        if ($user->tickets()->where('status', '!=', 'Resolvido')->exists()) {
-            return back()->with('error', 'Este vendedor já tem um ticket não resolvido.');
-        }
-        
         
         $suporte = User::role('support')->first();
         
