@@ -10,96 +10,155 @@ use App\Models\User;
 class TicketController extends Controller
 {
     public function index()
-{
-    $user = auth()->user();
-    $ticketsQuery = Ticket::with('vendedor');
-
-    if ($user->hasRole('vendedor')) {
-        $ticketsQuery->where('vendedor_id', $user->id);
-    }
-
-
-    $ticketsAbertosMaisDe24Horas = (clone $ticketsQuery)
-        ->where('status', 'aberto')
-        ->where('created_at', '<', now()->subHours(24))
-        ->exists();
-
-
-    $ticketsAtrasados = (clone $ticketsQuery)
-        ->where('status', 'aberto')
-        ->where('created_at', '<', now()->subHours(24))
+    {
+        $user = auth()->user();
+        $ticketsQuery = Ticket::with('vendedor');
+    
+        if ($user->hasRole('vendedor') || $user->hasRole('support')) {
+            if ($user->hasRole('vendedor')) {
+                $ticketsQuery->where('vendedor_id', $user->id);
+            }
+        } else {
+            abort(403, 'Acesso negado');
+        }
+    
+        $ticketsAtrasados = (clone $ticketsQuery)
+        ->where('status', 'Atrasado')
         ->get();
-
-    $tickets = $ticketsQuery->paginate(3);
-
-    return view('admin.tickets.index', compact('tickets', 'ticketsAbertosMaisDe24Horas', 'ticketsAtrasados'));
-}
+    
+    
+        $todosTickets = $ticketsQuery->get();
+    
+        if ($ticketsAtrasados->isNotEmpty()) {
+            return view('admin.tickets.index', compact('ticketsAtrasados', 'todosTickets'));
+        }
+    
+        if ($todosTickets->isNotEmpty()) {
+            return view('admin.tickets.index', compact('todosTickets'));
+        }
+    
+        return view('admin.tickets.index', compact('ticketsAtrasados', 'todosTickets'));
+    }
+    
 
     public function create()
     {
-        $vendedores = Vendedor::where('status', 'Ativo')->get();
+        $vendedores = User::role('vendedor')->get();  
+        
         return view('admin.tickets.create', compact('vendedores'));
     }
-
+    
+    
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'assunto' => 'required|string|max:255',
-        'descricao' => 'required|string',
-        'status' => 'required|string',
-    ]);
-
-
-    $suporte = User::role('support')->first();
-
-    if (!$suporte) {
-        return back()->with('error', 'Nenhum suporte disponível para atribuição.');
+    {
+        $validated = $request->validate([
+            'assunto' => 'required|string|max:255',
+            'descricao' => 'required|string',
+            'status' => 'required|string',
+            'vendedor_id' => 'required|exists:users,id', 
+        ]);
+        
+       
+        $user = User::findOrFail($validated['vendedor_id']);
+        
+   
+        if (!$user->hasRole('vendedor')) {
+            return back()->with('error', 'O usuário selecionado não é um vendedor.');
+        }
+    
+       
+        $vendedor = Vendedor::where('user_id', $user->id)->first();
+        if (!$vendedor) {
+            return back()->with('error', 'Vendedor não encontrado no sistema.');
+        }
+        
+       
+        if ($user->tickets()->where('status', '!=', 'Resolvido')->exists()) {
+            return back()->with('error', 'Este vendedor já tem um ticket não resolvido.');
+        }
+        
+        
+        $suporte = User::role('support')->first();
+        
+        if (!$suporte) {
+            return back()->with('error', 'Nenhum suporte disponível para atribuição.');
+        }
+        
+    
+        $ticket = Ticket::create([
+            'assunto' => $validated['assunto'],
+            'descricao' => $validated['descricao'],
+            'status' => $validated['status'],
+            'vendedor_id' => $validated['vendedor_id'], 
+            'suporte_id' => $suporte->id, 
+        ]);
+        
+        
+        switch ($validated['status']) {
+            case 'Aberto':
+                $vendedor->increment('tickets_abertos');
+                break;
+            case 'Em andamento':
+                $vendedor->increment('tickets_em_andamento');
+                break;
+            case 'Resolvido':
+                $vendedor->increment('tickets_resolvido');
+                break;
+        }
+    
+        return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso!');
     }
+    
 
-
-    $ticket = Ticket::create([
-        'assunto' => $validated['assunto'],
-        'descricao' => $validated['descricao'],
-        'status' => $validated['status'],
-        'vendedor_id' => auth()->user()->id,
-        'suporte_id' => $suporte->id,
-    ]);
-
-    return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso!');
-}
 
     public function show(Ticket $ticket)
     {
+        $ticket->load('vendedor', 'suporte');
+       
         return view('admin.tickets.show', compact('ticket'));
     }
+    
 
     public function edit(Ticket $ticket)
     {
-        $vendedores = Vendedor::where('status', 'Ativo')->get();
-        $suportes = User::role('support')->get();
-        return view('admin.tickets.edit', compact('ticket', 'vendedores', 'suportes'));
+      
+        $vendedores = User::role('vendedor')->get();
+        return view('admin.tickets.edit', compact('ticket', 'vendedores'));
     }
+    
 
+   
     public function update(Request $request, Ticket $ticket)
     {
+       
+        $validated = $request->validate([
+            'assunto' => 'required|string|max:255',
+            'descricao' => 'required|string',
+            'status' => 'required|string',
+            'vendedor_id' => 'required|exists:users,id',
+        ]);
+        
 
-    $request->merge([
-        'status' => strtolower($request->status),
-    ]);
-
-    $validated = $request->validate([
-        'assunto' => 'required|string|max:255',
-        'descricao' => 'required|string',
-        'status' => 'required|string|in:aberto,em andamento,resolvido,atrasado',  // Aceitando minúsculas
-        'vendedor_id' => 'required|exists:vendedores,id',
-        'suporte_id' => 'nullable|exists:users,id',
-    ]);
-
-    $ticket->update($validated);
-
-    return redirect()->route('tickets.index')->with('success', 'Ticket atualizado com sucesso!');
+        $user = User::findOrFail($validated['vendedor_id']);
+        
+       
+        if (!$user->hasRole('vendedor')) {
+            return back()->with('error', 'O usuário selecionado não é um vendedor.');
+        }
+    
+       
+        $ticket->update([
+            'assunto' => $validated['assunto'],
+            'descricao' => $validated['descricao'],
+            'status' => $validated['status'],
+            'vendedor_id' => $validated['vendedor_id'],
+        ]);
+    
+    
+        return redirect()->route('tickets.index')->with('success', 'Ticket atualizado com sucesso!');
     }
-
+    
+            
 
     public function destroy(Ticket $ticket)
     {

@@ -10,7 +10,10 @@
                     <th>Vendedor</th>
                     <th>E-mail</th>
                     <th>Status</th>
-                    <th>Tickets</th>
+                    <th>Data</th>
+                    <th>Tickets Abertos</th>
+                    <th>Tickets em Andamento</th>
+                    <th>Tickets Resolvidos</th>
                 </tr>
             </thead>
             <tbody>
@@ -19,17 +22,16 @@
                         <td>{{ $vendedor->nome }}</td>
                         <td>{{ $vendedor->email }}</td>
                         <td>{{ $vendedor->status }}</td>
-                        <td>
-                            @if ($vendedor->tickets_count == 0)
-                                Nenhum ticket associado
-                            @else
-                                {{ $vendedor->tickets_count }} ticket(s) associado(s)
-                            @endif
-                        </td>
+                        <td> {{$vendedor->created_at->format('y-d')}} </td>
+                        <td>{{ $vendedor->tickets_abertos }}</td>
+                        <td>{{ $vendedor->tickets_em_andamento }}</td>
+                        <td>{{ $vendedor->tickets_resolvido }}</td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
+
+        <!-- Paginação -->
         {{ $vendedores->links() }}
     </div>
 </x-app-layout>

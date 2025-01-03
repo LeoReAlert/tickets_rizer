@@ -12,9 +12,10 @@ class VendedorController extends Controller
 {
     public function index()
     {
-        $vendedores = Vendedor::withCount('tickets')->paginate(3);
+        $vendedores = Vendedor::paginate(10);
         return view('admin.vendedores.index', compact('vendedores'));
     }
+    
 
     public function create()
     {
@@ -25,39 +26,38 @@ class VendedorController extends Controller
     public function store(Request $request)
     {
 
-        $request->validate([
+        $validated = $request->validate([
             'nome' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'telefone' => 'required|string|max:15',
+            'telefone' => 'required|string|max:15|unique:vendedores,telefone',
             'status' => 'required|string|in:Ativo,Inativo',
             'senha' => 'required|string|min:8|confirmed',
         ]);
-
-
+    
+    
         $user = User::create([
-            'name' => $request->nome,
-            'email' => $request->email,
-            'password' => bcrypt($request->senha),
+            'name' => $validated['nome'],
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['senha']),
         ]);
-
-
+    
+        
         $role = Role::findByName('vendedor');
         $user->assignRole($role);
-
-
+    
+    
         $vendedor = Vendedor::create([
-            'user_id' => $user->id,
-            'nome' => $request->nome,
-            'email' => $request->email,
-            'telefone' => $request->telefone,
-            'status' => $request->status,
+            'user_id' => $user->id,   
+            'nome' => $validated['nome'],
+            'email' => $validated['email'],
+            'telefone' => $validated['telefone'],
+            'status' => $validated['status'],
         ]);
-
+    
+    
         return redirect()->route('vendedores.index')->with('success', 'Vendedor criado com sucesso!');
     }
-
-
-
+    
 
     public function show(Vendedor $vendedor)
     {

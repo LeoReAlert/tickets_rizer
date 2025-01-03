@@ -18,7 +18,6 @@
         </div>
     @endif
 
-
     <div class="container mt-5">
         <form action="{{ route('tickets.store') }}" method="POST">
             @csrf
@@ -57,7 +56,20 @@
                 @enderror
             </div>
 
-            <input type="hidden" name="vendedor_id" value="{{ auth()->user()->id }}">
+            <div class="mb-3">
+                <label for="vendedor_id" class="form-label">Vendedor</label>
+                <select class="form-control @error('vendedor_id') is-invalid @enderror" id="vendedor_id" name="vendedor_id" required>
+                    <option value="">Selecione o vendedor</option>
+                    @foreach ($vendedores as $vendedor)
+                        <option value="{{ $vendedor->id }}" class="text-dark" {{ old('vendedor_id') == $vendedor->id ? 'selected' : '' }}>
+                            {{ $vendedor->name }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('vendedor_id')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
 
             <button type="submit" class="btn btn-primary">Criar Ticket</button>
         </form>
