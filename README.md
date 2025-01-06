@@ -16,7 +16,7 @@ Este é um projeto Laravel para Rizer abaixo estão as instruções para configu
    No terminal rodar o camando para instalar pacotes:
 
    ```bash
-     composer install --no-dev ou composer install
+     composer install --no-dev
    ```
 
    1. **Clone o repositório**
