@@ -38,7 +38,6 @@
             @method('PUT')
             @csrf
 
-          
             <div class="mb-3">
                 <label for="assunto" class="form-label">Assunto</label>
                 <input type="text" class="form-control @error('assunto') is-invalid @enderror" id="assunto"
@@ -48,7 +47,6 @@
                 @enderror
             </div>
 
-          
             <div class="mb-3">
                 <label for="descricao" class="form-label">Descrição</label>
                 <textarea class="form-control @error('descricao') is-invalid @enderror" id="descricao" name="descricao" rows="3"
@@ -58,7 +56,6 @@
                 @enderror
             </div>
 
-          
             <div class="mb-3">
                 <label for="status" class="form-label">Status</label>
                 <select class="form-control @error('status') is-invalid @enderror" id="status" name="status" required>
@@ -73,23 +70,14 @@
                 @enderror
             </div>
 
-           
+   
+          <input type="hidden" name="vendedor_id" value="{{ $ticket->vendedor->id }}">
             <div class="mb-3">
                 <label for="vendedor_id" class="form-label">Vendedor</label>
-                <select class="form-control @error('vendedor_id') is-invalid @enderror" id="vendedor_id" name="vendedor_id" required>
-                    <option value="">Selecione o vendedor</option>
-                    @foreach ($vendedores as $vendedor)
-                        <option value="{{ $vendedor->id }}" class="text-dark" {{ old('vendedor_id', $ticket->vendedor_id) == $vendedor->id ? 'selected' : '' }}>
-                            {{ $vendedor->name }}
-                        </option>
-                    @endforeach
-                </select>
-                @error('vendedor_id')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                <input type="text" class="form-control" value="{{ $ticket->vendedor->name }}" readonly>
             </div>
 
-    
+
             <button type="submit" class="btn btn-primary">Atualizar Ticket</button>
         </form>
     </div>

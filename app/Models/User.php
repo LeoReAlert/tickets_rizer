@@ -48,4 +48,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Ticket::class, 'vendedor_id');
     }
+
+    public function vendedor()
+    {
+        return $this->hasOne(Vendedor::class);
+    }
 }

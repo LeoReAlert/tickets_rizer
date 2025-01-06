@@ -10,12 +10,23 @@ use Spatie\Permission\Models\Role;
 
 class VendedorController extends Controller
 {
-    public function index()
-    {
-        $vendedores = Vendedor::paginate(10);
-        return view('admin.vendedores.index', compact('vendedores'));
+    public function index(Request $request)
+{
+    \DB::flushQueryLog();
+
+    $query = Vendedor::query();
+
+    if ($request->has('search') && $request->search) {
+        $searchTerm = $request->search;
+        $query->where('nome', 'like', '%' . $searchTerm . '%')
+              ->orWhere('email', 'like', '%' . $searchTerm . '%');
     }
-    
+
+    $vendedores = $query->paginate(10);
+
+    return view('admin.vendedores.index', compact('vendedores'));
+}
+
 
     public function create()
     {
@@ -59,14 +70,17 @@ class VendedorController extends Controller
     }
     
 
-    public function show(Vendedor $vendedor)
+    public function show(Request $request, Vendedor $vendedor)
     {
-        $ticketsAbertos = $vendedor->ticketsAbertos()->count();
-        $ticketsEmAndamento = $vendedor->ticketsEmAndamento()->count();
-        $ticketsResolvidos = $vendedor->ticketsResolvidos()->count();
-
+        // Buscar tickets de acordo com o status
+        $ticketsAbertos = $vendedor->tickets()->where('status', 'Aberto')->get();
+        $ticketsEmAndamento = $vendedor->tickets()->where('status', 'Em andamento')->get();
+        $ticketsResolvidos = $vendedor->tickets()->where('status', 'Resolvido')->get();
+    
         return view('admin.vendedores.show', compact('vendedor', 'ticketsAbertos', 'ticketsEmAndamento', 'ticketsResolvidos'));
     }
+    
+    
 
     public function edit(Vendedor $vendedor)
     {
@@ -74,25 +88,35 @@ class VendedorController extends Controller
     }
 
     public function update(Request $request, Vendedor $vendedor)
-    {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'nome' => 'required|string|max:255',
-            'email' => 'required|email|unique:vendedores,email,' . $vendedor->id,
-            'telefone' => 'required|string|max:15',
-            'status' => 'required|string|in:Ativo,Inativo',
-        ], [
-            'user_id.required' => 'O campo usuário é obrigatório.',
-            'user_id.exists' => 'Usuário não encontrado.',
-            'nome.required' => 'O campo nome é obrigatório.',
-            'email.unique' => 'Este e-mail já está em uso.',
-            'status.in' => 'O status deve ser Ativo ou Inativo.',
-        ]);
+   {
 
-        $vendedor->update($request->all());
+    $request->validate([
+        'user_id' => 'required|exists:users,id',
+        'nome' => 'required|string|max:255',
+        'email' => 'required|email|unique:vendedores,email,' . $vendedor->id,
+        'telefone' => 'required|string|max:15',
+        'status' => 'required|string|in:Ativo,Inativo',
+    ], [
+        'user_id.required' => 'O campo usuário é obrigatório.',
+        'user_id.exists' => 'Usuário não encontrado.',
+        'nome.required' => 'O campo nome é obrigatório.',
+        'email.unique' => 'Este e-mail já está em uso.',
+        'status.in' => 'O status deve ser Ativo ou Inativo.',
+    ]);
 
-        return redirect()->route('admin.vendedores.index')->with('success', 'Vendedor atualizado com sucesso!');
-    }
+
+    $vendedor->update([
+        'user_id' => $request->user_id,
+        'nome' => $request->nome,
+        'email' => $request->email,
+        'telefone' => $request->telefone,
+        'status' => $request->status,
+    ]);
+
+  
+    return redirect()->route('admin.vendedores.index')->with('success', 'Vendedor atualizado com sucesso!');
+   }
+
 
     public function destroy(Vendedor $vendedor)
     {

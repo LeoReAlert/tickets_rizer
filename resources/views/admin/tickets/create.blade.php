@@ -18,7 +18,7 @@
         </div>
     @endif
 
-    @if (session('error'))
+ @if (session('error'))
     <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
         <div id="errorToast" class="toast align-items-center text-bg-danger border-0" role="alert"
             aria-live="assertive" aria-atomic="true">
@@ -32,6 +32,7 @@
         </div>
     </div>
 @endif
+
 
     <div class="container mt-5">
         <form action="{{ route('tickets.store') }}" method="POST">

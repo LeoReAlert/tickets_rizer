@@ -19,11 +19,28 @@ class Vendedor extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function tickets()
     {
         return $this->hasMany(Ticket::class);
+    }
+
+    public function ticketsAbertos()
+    {
+        return $this->hasMany(Ticket::class, 'vendedor_id')->where('status', 'Aberto');
+    }
+
+  
+    public function ticketsEmAndamento()
+    {
+        return $this->hasMany(Ticket::class, 'vendedor_id')->where('status', 'Em andamento');
+    }
+
+    
+    public function ticketsResolvidos()
+    {
+        return $this->hasMany(Ticket::class, 'vendedor_id')->where('status', 'Resolvido');
     }
 }
