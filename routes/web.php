@@ -32,7 +32,9 @@ Route::middleware('auth')->group(function () {
 });
 
 //Rotas Vendedor
-Route::resource('vendedores', VendedorController::class);
+Route::resource('vendedores', VendedorController::class)
+    ->parameters(['vendedores' => 'vendedor']);
+
 
 //Rotas Tickets
 Route::resource('tickets', TicketController::class);

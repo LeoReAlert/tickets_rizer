@@ -88,34 +88,40 @@ class VendedorController extends Controller
     }
 
     public function update(Request $request, Vendedor $vendedor)
-   {
-
-    $request->validate([
-        'user_id' => 'required|exists:users,id',
-        'nome' => 'required|string|max:255',
-        'email' => 'required|email|unique:vendedores,email,' . $vendedor->id,
-        'telefone' => 'required|string|max:15',
-        'status' => 'required|string|in:Ativo,Inativo',
-    ], [
-        'user_id.required' => 'O campo usuário é obrigatório.',
-        'user_id.exists' => 'Usuário não encontrado.',
-        'nome.required' => 'O campo nome é obrigatório.',
-        'email.unique' => 'Este e-mail já está em uso.',
-        'status.in' => 'O status deve ser Ativo ou Inativo.',
-    ]);
-
-
-    $vendedor->update([
-        'user_id' => $request->user_id,
-        'nome' => $request->nome,
-        'email' => $request->email,
-        'telefone' => $request->telefone,
-        'status' => $request->status,
-    ]);
-
-  
-    return redirect()->route('admin.vendedores.index')->with('success', 'Vendedor atualizado com sucesso!');
-   }
+    {
+        $validated = $request->validate([
+            'nome' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $vendedor->user_id,
+            'telefone' => 'required|string|max:15|unique:vendedores,telefone,' . $vendedor->id,
+            'status' => 'required|string|in:Ativo,Inativo',
+            'senha' => 'nullable|string|min:8|confirmed',
+        ], [
+            'nome.required' => 'O campo nome é obrigatório.',
+            'email.unique' => 'Este e-mail já está em uso.',
+            'telefone.unique' => 'Este telefone já está em uso.',
+            'status.in' => 'O status deve ser Ativo ou Inativo.',
+            'senha.confirmed' => 'A confirmação da senha não corresponde.',
+        ]);
+    
+      
+        $user = $vendedor->user; 
+        $user->update([
+            'name' => $validated['nome'],
+            'email' => $validated['email'],
+            'password' => $validated['senha'] ? bcrypt($validated['senha']) : $user->password, 
+        ]);
+    
+      
+        $vendedor->update([
+            'nome' => $validated['nome'],
+            'email' => $validated['email'],
+            'telefone' => $validated['telefone'],
+            'status' => $validated['status'],
+        ]);
+    
+        return redirect()->route('vendedores.index')->with('success', 'Vendedor atualizado com sucesso!');
+    }
+    
 
 
     public function destroy(Vendedor $vendedor)

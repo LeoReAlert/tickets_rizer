@@ -39,15 +39,6 @@
             @csrf
 
             <div class="mb-3">
-                <label for="user_id" class="form-label">Usuário</label>
-                <input type="text" class="form-control @error('user_id') is-invalid @enderror" id="user_id"
-                    name="user_id" value="{{ old('user_id', $vendedor->user_id) }}" required readonly>
-                @error('user_id')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="mb-3">
                 <label for="nome" class="form-label">Nome</label>
                 <input type="text" class="form-control @error('nome') is-invalid @enderror" id="nome"
                     name="nome" value="{{ old('nome', $vendedor->nome) }}" required>
@@ -84,6 +75,20 @@
                 @error('status')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
+            </div>
+
+            <div class="mb-3">
+                <label for="senha" class="form-label">Senha (Opcional)</label>
+                <input type="password" class="form-control @error('senha') is-invalid @enderror" id="senha"
+                    name="senha">
+                @error('senha')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="mb-3">
+                <label for="senha_confirmation" class="form-label">Confirme a Senha</label>
+                <input type="password" class="form-control" id="senha_confirmation" name="senha_confirmation">
             </div>
 
             <button type="submit" class="btn btn-primary">Atualizar Vendedor</button>
