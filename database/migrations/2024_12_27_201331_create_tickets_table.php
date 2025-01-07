@@ -12,13 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tickets', function (Blueprint $table) {
-            $table->id();
-            $table->string('assunto');
-            $table->text('descricao');
-            $table->foreignId('vendedor_id')->nullable()->constrained('users')->onDelete('set null'); // Relacionando com User
-            $table->enum('status', ['Aberto', 'Em andamento', 'Atrasado', 'Resolvido'])->default('Aberto');
-            $table->timestamps();
+            $table->id();  
+            $table->string('assunto');  
+            $table->text('descricao');  
+            $table->foreignId('vendedor_id')->nullable()->constrained('users')->onDelete('set null');  
+            $table->enum('status', ['Aberto', 'Em andamento', 'Atrasado', 'Resolvido'])->default('Aberto');  
+            $table->timestamps();  
         });
+        
     }
 
     /**

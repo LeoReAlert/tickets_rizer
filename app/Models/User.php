@@ -44,13 +44,14 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function tickets()
-    {
-        return $this->hasMany(Ticket::class, 'vendedor_id');
-    }
-
     public function vendedor()
     {
-        return $this->hasOne(Vendedor::class);
+        return $this->hasOne(Vendedor::class, 'user_id'); 
+    }
+
+   
+    public function tickets()
+    {
+        return $this->hasManyThrough(Ticket::class, Vendedor::class, 'user_id', 'vendedor_id');
     }
 }
