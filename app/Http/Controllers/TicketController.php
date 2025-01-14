@@ -59,19 +59,16 @@ class TicketController extends Controller
         'vendedor_id' => 'required|exists:users,id',
     ]);
 
-
     $user = User::findOrFail($validated['vendedor_id']);
 
     if (!$user->hasRole('vendedor')) {
         return back()->with('error', 'O usuário selecionado não é um vendedor.');
     }
 
-
     $vendedor = Vendedor::where('user_id', $user->id)->first();
     if (!$vendedor) {
         return back()->with('error', 'Vendedor não encontrado no sistema.');
     }
-
 
     $ticketExistente = Ticket::where('vendedor_id', $vendedor->id)
                              ->whereIn('status', ['Aberto', 'Em andamento'])
@@ -80,7 +77,6 @@ class TicketController extends Controller
     if ($ticketExistente) {
         return back()->with('error', 'O vendedor já possui um ticket em aberto ou em andamento. Não é possível cadastrar um novo ticket.');
     }
-
 
     $suporte = User::role('support')->first();
     if (!$suporte) {
@@ -95,7 +91,6 @@ class TicketController extends Controller
         'vendedor_id' => $validated['vendedor_id'],
         'suporte_id' => $suporte->id,
     ]);
-
 
     switch ($validated['status']) {
         case 'Aberto':
@@ -117,7 +112,7 @@ class TicketController extends Controller
         $user->notify(new NewTicketNotification($ticket));
     }
 
-    return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso!');
+    return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso notificação enviada!');
   }
 
     public function show(Ticket $ticket)
