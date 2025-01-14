@@ -46,10 +46,10 @@ class User extends Authenticatable
 
     public function vendedor()
     {
-        return $this->hasOne(Vendedor::class, 'user_id'); 
+        return $this->hasOne(Vendedor::class, 'user_id');
     }
 
-   
+
     public function tickets()
     {
         return $this->hasManyThrough(Ticket::class, Vendedor::class, 'user_id', 'vendedor_id');

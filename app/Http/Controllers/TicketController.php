@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Ticket;
 use App\Models\Vendedor;
 use Illuminate\Http\Request;
+use App\Notifications\NewTicketNotification;
 use App\Models\User;
 use Carbon\Carbon;
 
@@ -109,6 +110,12 @@ class TicketController extends Controller
     }
 
     $vendedor->save();
+
+    $supportUsers = User::role('support')->first();
+
+    foreach ($supportUsers as $user) {
+        $user->notify(new NewTicketNotification($ticket));
+    }
 
     return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso!');
   }
