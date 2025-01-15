@@ -38,7 +38,7 @@ class TicketController extends Controller
 
     public function create()
     {
-        $vendedores = User::role('vendedor')->get();
+        $ticketsQuery = $this->TicketRepository->getAllVendedor();
 
         return view('admin.tickets.create', compact('vendedores'));
     }
@@ -53,77 +53,47 @@ class TicketController extends Controller
             'vendedor_id' => 'required|exists:users,id',
         ]);
 
-        $user = User::findOrFail($validated['vendedor_id']);
+        try {
+            $ticket = $this->TicketRepository->createTicket($validated);
 
-        if (!$user->hasRole('vendedor')) {
-            return back()->with('error', 'O usuário selecionado não é um vendedor.');
+            $supportUsers = User::role('support')->get();
+            foreach ($supportUsers as $user) {
+                $user->notify(new NewTicketNotification($ticket));
+            }
+
+            return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso e notificação enviada!');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        $vendedor = Vendedor::where('user_id', $user->id)->first();
-        if (!$vendedor) {
-            return back()->with('error', 'Vendedor não encontrado no sistema.');
-        }
-
-        $ticketExistente = Ticket::where('vendedor_id', $vendedor->id)
-                                 ->whereIn('status', ['Aberto', 'Em andamento'])
-                                 ->exists();
-
-        if ($ticketExistente) {
-            return back()->with('error', 'O vendedor já possui um ticket em aberto ou em andamento. Não é possível cadastrar um novo ticket.');
-        }
-
-        $suporte = User::role('support')->first();
-        if (!$suporte) {
-            return back()->with('error', 'Nenhum suporte disponível para atribuição.');
-        }
-
-
-        $ticket = Ticket::create([
-            'assunto' => $validated['assunto'],
-            'descricao' => $validated['descricao'],
-            'status' => $validated['status'],
-            'vendedor_id' => $validated['vendedor_id'],
-            'suporte_id' => $suporte->id,
-        ]);
-
-        switch ($validated['status']) {
-            case 'Aberto':
-                $vendedor->increment('tickets_abertos');
-                break;
-            case 'Em andamento':
-                $vendedor->increment('tickets_em_andamento');
-                break;
-            case 'Resolvido':
-                $vendedor->increment('tickets_resolvido');
-                break;
-        }
-
-        $vendedor->save();
-
-        $supportUsers = User::role('support')->first();
-
-        foreach ($supportUsers as $user) {
-            $user->notify(new NewTicketNotification($ticket));
-        }
-
         return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso notificação enviada!');
     }
 
-    public function show(Ticket $ticket)
+    public function show($id)
     {
-        $ticket->load('vendedor', 'suporte');
+        try {
+            $ticket = $this->TicketRepository->getTicketWithRelations($id);
 
-        return view('admin.tickets.show', compact('ticket'));
+            if (!auth()->user()->can('view', $ticket)) {
+                abort(403, 'Você não tem permissão para visualizar este ticket.');
+            }
+            return view('admin.tickets.show', compact('ticket'));
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
 
-
-    public function edit(Ticket $ticket)
+    public function edit($id)
     {
+        try {
+            $ticket = $this->TicketRepository->getTicketById($id);
 
-        $vendedores = User::role('vendedor')->get();
-        return view('admin.tickets.edit', compact('ticket', 'vendedores'));
+            $vendedores = $this->TicketRepository->getVendedores();
+
+            return view('admin.tickets.edit', compact('ticket', 'vendedores'));
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
     }
-
 
     public function update(Request $request, Ticket $ticket)
     {
