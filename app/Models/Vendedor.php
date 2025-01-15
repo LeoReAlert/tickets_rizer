@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Traits\HasRoles;
 use App\Models\User;
 
 
 class Vendedor extends Model
 {
-    use HasFactory;
+    use HasFactory, HasRoles;
 
     protected $fillable = [
         'user_id', 'nome', 'email', 'telefone', 'status', 'tickets_abertos', 'tickets_em_andamento', 'tickets_resolvidos'
@@ -24,7 +25,7 @@ class Vendedor extends Model
 
     public function tickets()
     {
-        return $this->hasMany(Ticket::class, 'vendedor_id'); 
+        return $this->hasMany(Ticket::class, 'vendedor_id');
     }
 
     public function ticketsAbertos()
