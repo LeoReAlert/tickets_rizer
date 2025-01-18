@@ -11,7 +11,7 @@ use Carbon\Carbon;
 
 class TicketController extends Controller
 {
-    private $TicketRepository;
+    private $ticketRepository;
 
     public function __construct(TicketRepository $TicketRepository)
     {
@@ -20,9 +20,9 @@ class TicketController extends Controller
     public function index()
     {
         $user = auth()->user();
-
+    
         $ticketsQuery = $this->TicketRepository->getAllVendedor();
-
+    
         if ($user->hasRole('vendedor') || $user->hasRole('support')) {
             if ($user->hasRole('vendedor')) {
                 $ticketsQuery->where('vendedor_id', $user->id);
@@ -30,9 +30,14 @@ class TicketController extends Controller
         } else {
             abort(403, 'Acesso negado');
         }
-
-        $ticketsQuery = $this->TicketRepository->TicketsAtrasados();
-
+    
+        $ticketsData = $this->TicketRepository->TicketsAtrasados();
+    
+        $ticketsAtrasados = $ticketsData['ticketsAtrasados'];
+        $ticketsAtrasadosMaisDe24Horas = $ticketsData['ticketsAtrasadosMaisDe24Horas'];
+        $todosTickets = $ticketsData['todosTickets'];
+        $noTickets = $ticketsData['noTickets'];
+    
         return view('admin.tickets.index', compact('ticketsAtrasadosMaisDe24Horas', 'ticketsAtrasados', 'todosTickets', 'noTickets'));
     }
 
