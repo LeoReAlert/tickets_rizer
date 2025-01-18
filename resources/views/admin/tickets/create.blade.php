@@ -77,7 +77,7 @@
                 <select class="form-control @error('vendedor_id') is-invalid @enderror" id="vendedor_id" name="vendedor_id" required>
                     <option value="">Selecione o vendedor</option>
                     @foreach ($vendedores as $vendedor)
-                        <option value="{{ $vendedor->id }}" class="text-dark" {{ old('vendedor_id') == $vendedor->id ? 'selected' : '' }}>
+                        <option value="{{ $vendedor->user_id }}" class="text-dark" {{ old('vendedor_id') == $vendedor->user_id ? 'selected' : '' }}>
                             {{ $vendedor->nome }}
                         </option>
                     @endforeach
@@ -86,6 +86,7 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+
 
 
             <button type="submit" class="btn btn-primary">Criar Ticket</button>

@@ -48,30 +48,42 @@ class TicketController extends Controller
         return view('admin.tickets.create', compact('vendedores'));
     }
 
-
     public function store(Request $request)
     {
         $validated = $request->validate([
             'assunto' => 'required|string|max:255',
             'descricao' => 'required|string',
             'status' => 'required|string|in:Aberto,Em andamento,Atrasado,Resolvido',
-            'vendedor_id' => 'required|exists:users,id',
+            'vendedor_id' => 'required|exists:vendedores,user_id', 
         ]);
-
+    
         try {
-            $ticket = $this->TicketRepository->createTicket($validated);
-
-            $supportUsers = User::role('support')->get();
-            foreach ($supportUsers as $user) {
-                $user->notify(new NewTicketNotification($ticket));
+        
+            $ticket = $this->TicketRepository->createTicket([
+                'assunto' => $validated['assunto'],
+                'descricao' => $validated['descricao'],
+                'status' => $validated['status'],
+                'vendedor_id' => $validated['vendedor_id'], 
+            ]);
+    
+            if ($ticket) {
+                $supportUsers = User::role('support')->get();
+                foreach ($supportUsers as $user) {
+                    $user->notify(new NewTicketNotification($ticket));
+                }
+    
+                return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso e notificação enviada!');
             }
-
-            return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso e notificação enviada!');
+    
+            return back()->with('error', 'Ocorreu um erro ao criar o ticket.');
+    
         } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage());
+            \Log::error('Erro ao criar ticket: ' . $e->getMessage());
+            return back()->with('error', 'Erro ao criar o ticket: ' . $e->getMessage());
         }
-        return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso notificação enviada!');
     }
+    
+
 
     public function show($id)
     {

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Vendedor;
+use App\Models\User;
 
 class Ticket extends Model
 {
@@ -12,15 +13,17 @@ class Ticket extends Model
 
     protected $fillable = ['assunto', 'descricao', 'status', 'vendedor_id', 'suporte_id'];
 
+    
     public function vendedor()
     {
-        return $this->belongsTo(User::class, 'vendedor_id');
+        return $this->belongsTo(Vendedor::class, 'vendedor_id');
     }
 
     public function suporte()
     {
-    return $this->belongsTo(User::class, 'suporte_id');
+        return $this->belongsTo(User::class, 'suporte_id');
     }
+
 
     public function statusLabel()
     {
@@ -33,5 +36,4 @@ class Ticket extends Model
 
         return $statusLabels[strtoupper($this->status)] ?? 'Desconhecido';
     }
-
 }
