@@ -43,7 +43,7 @@ class TicketController extends Controller
 
     public function create()
     {
-        $ticketsQuery = $this->TicketRepository->getAllVendedor();
+        $vendedores = $this->TicketRepository->getAllVendedor();
 
         return view('admin.tickets.create', compact('vendedores'));
     }

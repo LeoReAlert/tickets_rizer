@@ -20,7 +20,9 @@ class TicketRepository
     }
     public function getAllVendedor()
     {
-        $ticketsQuery = Ticket::with('vendedor')->get();
+        $vendedores = Vendedor::all();
+        
+        return $vendedores;
     }
 
     public function TicketsAtrasados()
@@ -49,46 +51,66 @@ class TicketRepository
     }
 
     public function createTicket(array $data)
-    {
-        DB::beginTransaction();
+{
+    DB::beginTransaction();
 
-        try {
-            $vendedor = Vendedor::where('user_id', $data['vendedor_id'])->first();
-            if (!$vendedor) {
-                throw new \Exception('Vendedor não encontrado no sistema.');
-            }
+    try {
+  
+        $vendedor = Vendedor::where('user_id', $data['vendedor_id'])->first();
 
-            $ticketExistente = Ticket::where('vendedor_id', $vendedor->id)
-                ->whereIn('status', ['Aberto', 'Em andamento'])
-                ->exists();
 
-            if ($ticketExistente) {
-                throw new \Exception('O vendedor já possui um ticket em aberto ou em andamento.');
-            }
-
-            $suporte = User::role('support')->first();
-            if (!$suporte) {
-                throw new \Exception('Nenhum suporte disponível para atribuição.');
-            }
-
-            $ticket = Ticket::create([
-                'assunto' => $data['assunto'],
-                'descricao' => $data['descricao'],
-                'status' => $data['status'],
-                'vendedor_id' => $vendedor->id,
-                'suporte_id' => $suporte->id,
-            ]);
-
-            $this->atualizarContadoresVendedor($vendedor, $data['status']);
-
-            DB::commit();
-
-            return $ticket;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
+        if (!$vendedor) {
+            throw new \Exception('Vendedor não encontrado no sistema.');
         }
+
+        
+        $ticketExistente = Ticket::where('vendedor_id', $vendedor->id)
+            ->whereIn('status', ['Aberto', 'Em andamento'])
+            ->exists();
+
+   
+        if ($ticketExistente) {
+            throw new \Exception('O vendedor já possui um ticket em aberto ou em andamento.');
+        }
+
+
+        $suporte = User::role('support')->first();
+
+
+        if (!$suporte) {
+            throw new \Exception('Nenhum suporte disponível para atribuição.');
+        }
+
+ 
+        $ticket = Ticket::create([
+            'assunto' => $data['assunto'],
+            'descricao' => $data['descricao'],
+            'status' => $data['status'],
+            'vendedor_id' => $vendedor->id,
+            'suporte_id' => $suporte->id,
+        ]);
+
+ 
+        $this->atualizarContadoresVendedor($vendedor, $data['status']);
+
+ 
+        DB::commit();
+
+
+        return $ticket;
+    } catch (\Exception $e) {
+   
+        DB::rollBack();
+
+      
+        \Log::error('Erro ao criar ticket: ' . $e->getMessage());
+
+    
+        throw $e;
     }
+}
+
+
 
     private function atualizarContadoresVendedor(Vendedor $vendedor, $status)
     {

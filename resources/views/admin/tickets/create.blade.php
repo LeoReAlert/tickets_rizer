@@ -78,7 +78,7 @@
                     <option value="">Selecione o vendedor</option>
                     @foreach ($vendedores as $vendedor)
                         <option value="{{ $vendedor->id }}" class="text-dark" {{ old('vendedor_id') == $vendedor->id ? 'selected' : '' }}>
-                            {{ $vendedor->name }}
+                            {{ $vendedor->nome }}
                         </option>
                     @endforeach
                 </select>
@@ -86,6 +86,7 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+
 
             <button type="submit" class="btn btn-primary">Criar Ticket</button>
         </form>
