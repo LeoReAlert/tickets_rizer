@@ -44,31 +44,31 @@ class VendedorController extends Controller
             'status' => 'required|string|in:Ativo,Inativo',
             'senha' => 'required|string|min:8|confirmed',
         ]);
-    
-    
+
+
         $user = User::create([
             'name' => $validated['nome'],
             'email' => $validated['email'],
             'password' => bcrypt($validated['senha']),
         ]);
-    
-        
+
+
         $role = Role::findByName('vendedor');
         $user->assignRole($role);
-    
-    
+
+
         $vendedor = Vendedor::create([
-            'user_id' => $user->id,   
+            'user_id' => $user->id,
             'nome' => $validated['nome'],
             'email' => $validated['email'],
             'telefone' => $validated['telefone'],
             'status' => $validated['status'],
         ]);
-    
-    
+
+
         return redirect()->route('vendedores.index')->with('success', 'Vendedor criado com sucesso!');
     }
-    
+
 
     public function show(Request $request, Vendedor $vendedor)
     {
@@ -76,11 +76,11 @@ class VendedorController extends Controller
         $ticketsAbertos = $vendedor->tickets()->where('status', 'Aberto')->get();
         $ticketsEmAndamento = $vendedor->tickets()->where('status', 'Em andamento')->get();
         $ticketsResolvidos = $vendedor->tickets()->where('status', 'Resolvido')->get();
-    
+
         return view('admin.vendedores.show', compact('vendedor', 'ticketsAbertos', 'ticketsEmAndamento', 'ticketsResolvidos'));
     }
-    
-    
+
+
 
     public function edit(Vendedor $vendedor)
     {
@@ -102,27 +102,25 @@ class VendedorController extends Controller
             'status.in' => 'O status deve ser Ativo ou Inativo.',
             'senha.confirmed' => 'A confirmação da senha não corresponde.',
         ]);
-    
-      
-        $user = $vendedor->user; 
+
+
+        $user = $vendedor->user;
         $user->update([
             'name' => $validated['nome'],
             'email' => $validated['email'],
-            'password' => $validated['senha'] ? bcrypt($validated['senha']) : $user->password, 
+            'password' => $validated['senha'] ? bcrypt($validated['senha']) : $user->password,
         ]);
-    
-      
+
+
         $vendedor->update([
             'nome' => $validated['nome'],
             'email' => $validated['email'],
             'telefone' => $validated['telefone'],
             'status' => $validated['status'],
         ]);
-    
+
         return redirect()->route('vendedores.index')->with('success', 'Vendedor atualizado com sucesso!');
     }
-    
-
 
     public function destroy(Vendedor $vendedor)
     {
