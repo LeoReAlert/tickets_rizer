@@ -18,6 +18,8 @@ class TicketRepository
     public function GetUniqueTicket($user_id)
     {
         $ticket = Ticket::find($user_id);
+        
+        return $ticket;
     }
     public function getAllVendedor()
     {
