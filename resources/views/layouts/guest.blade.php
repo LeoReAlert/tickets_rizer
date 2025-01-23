@@ -20,7 +20,7 @@
     <div class="flex min-h-screen flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0">
         <div>
             <a href="/">
-                <x-application-logo class="h-20 w-20 fill-current text-gray-500" />
+                <img src="https://rizer.com.br/img/rizer-sistemas.svg" width="100%" alt="Rizer Sistemas">
             </a>
         </div>
 
