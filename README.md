@@ -1,6 +1,6 @@
 # Projeto Laravel
 
-Este é um projeto Laravel totalmente open source
+Este é um projeto Laravel totalmente open source não venda sem autorização!
 
 ## Requisitos
 
