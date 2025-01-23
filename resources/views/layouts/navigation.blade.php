@@ -2,10 +2,6 @@
     <div class="container-fluid">
 
         <div class="d-flex align-items-center">
-
-            {{-- <a class="navbar-brand me-3" href="{{ route('dashboard') }}">
-                <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
-            </a> --}}
             <img src="https://rizer.com.br/img/rizer-sistemas.svg" width="100%" alt="Rizer Sistemas" style="margin:20px;">
 
             <button class="btn btn-light me-3" onclick="window.location.href='{{ route('dashboard') }}'" type="button">
