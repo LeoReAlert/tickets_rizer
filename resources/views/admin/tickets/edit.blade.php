@@ -2,7 +2,6 @@
     <x-slot name="header">
         <h1>Editar Ticket</h1>
     </x-slot>
-
     @if (session('success'))
         <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
             <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert"
@@ -32,8 +31,7 @@
             </div>
         </div>
     @endif
-
-    <div class="container mt-5">
+    <div class="container mb-5 mt-5">
         <form action="{{ route('tickets.update', $ticket->id) }}" method="POST">
             @method('PUT')
             @csrf

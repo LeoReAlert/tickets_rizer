@@ -200,9 +200,9 @@ class TicketRepository
         return $ticket;
     }
 
-    public function getVendedores()
+    public function getVendedores($id)
     {
-        return User::role('vendedor')->get();
+        return Vendedor::findOrFail($id);
     }
 
     public function getTicketById($id)

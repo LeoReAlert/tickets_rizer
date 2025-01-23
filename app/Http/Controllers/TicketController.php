@@ -100,10 +100,11 @@ class TicketController extends Controller
 
     public function edit($id)
     {
+
         try {
             $ticket = $this->ticketRepository->getTicketById($id);
 
-            $vendedores = $this->ticketRepository->getVendedores();
+            $vendedores = $this->ticketRepository->getVendedores($id);
 
             return view('admin.tickets.edit', compact('ticket', 'vendedores'));
         } catch (\Exception $e) {
@@ -111,37 +112,20 @@ class TicketController extends Controller
         }
     }
 
-    public function update(Request $request, Ticket $ticket)
-    {
-
-        $validated = $request->validate([
-            'assunto' => 'required|string|max:255',
-            'descricao' => 'required|string',
-            'status' => 'required|string|in:Aberto,Em andamento,Atrasado,Resolvido',
-            'vendedor_id' => 'required|exists:users,id',
-            'suporte_id' => 'required|exists:users,id',
-        ]);
-
-        $user = User::findOrFail($validated['vendedor_id']);
 
 
-        if (!$user->hasRole('vendedor')) {
-            return back()->with('error', 'O usuário selecionado não é um vendedor.');
-        }
+    public function update(Request $request, $id)
+{
+    try {
+        $data = $request->all();
+        $ticket = $this->ticketRepository->updateTicket($id, $data);
 
-        $ticketRepository = app(TicketRepository::class);
-
-        $updatedTicket = $ticketRepository->updateTicket($ticket->id, $validated);
-
-        $vendedorRepository = app(VendedorRepository::class);
-
-        $vendedor = $vendedorRepository->GetUniqueVendedor($validated['vendedor_id']);
-
-        $this->atualizarContadoresVendedor($vendedor, $validated['status']);
-
-        return redirect()->route('tickets.index')->with('success', 'Ticket atualizado com sucesso!');
+        return redirect()->route('tickets.index')->with('success', 'Ticket atualizado com sucesso.');
+    } catch (\Exception $e) {
+        \Log::error('Erro ao atualizar ticket: ' . $e->getMessage());
+        return redirect()->back()->with('error', 'Erro ao atualizar o ticket.');
     }
-
+}
     public function destroy($id)
     {
         $this->ticketRepository->DeleteTicket($id);
