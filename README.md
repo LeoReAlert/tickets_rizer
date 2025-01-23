@@ -1,6 +1,6 @@
 # Projeto Laravel
 
-Este é um projeto Laravel para Rizer abaixo estão as instruções para configurar, rodar as migrações e seeders, além de outras informações importantes para rodar o projeto localmente.
+Este é um projeto Laravel totalmente open source
 
 ## Requisitos
 
