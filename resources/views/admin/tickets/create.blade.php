@@ -11,27 +11,27 @@
                     <div class="toast-body">
                         {{ session('success') }}
                     </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    <button type="button" class="btn-close btn-close-white m-auto me-2" data-bs-dismiss="toast"
                         aria-label="Close"></button>
                 </div>
             </div>
         </div>
     @endif
 
- @if (session('error'))
-    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
-        <div id="errorToast" class="toast align-items-center text-bg-danger border-0" role="alert"
-            aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body">
-                    {{ session('error') }}
+    @if (session('error'))
+        <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
+            <div id="errorToast" class="toast align-items-center text-bg-danger border-0" role="alert"
+                aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        {{ session('error') }}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white m-auto me-2" data-bs-dismiss="toast"
+                        aria-label="Close"></button>
                 </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                    aria-label="Close"></button>
             </div>
         </div>
-    </div>
-@endif
+    @endif
 
 
     <div class="container mt-5">
@@ -74,10 +74,12 @@
 
             <div class="mb-3">
                 <label for="vendedor_id" class="form-label">Vendedor</label>
-                <select class="form-control @error('vendedor_id') is-invalid @enderror" id="vendedor_id" name="vendedor_id" required>
+                <select class="form-control @error('vendedor_id') is-invalid @enderror" id="vendedor_id"
+                    name="vendedor_id" required>
                     <option value="">Selecione o vendedor</option>
                     @foreach ($vendedores as $vendedor)
-                        <option value="{{ $vendedor->user_id }}" class="text-dark" {{ old('vendedor_id') == $vendedor->user_id ? 'selected' : '' }}>
+                        <option value="{{ $vendedor->id }}" class="text-dark"
+                            {{ old('vendedor_id') == $vendedor->id ? 'selected' : '' }}>
                             {{ $vendedor->nome }}
                         </option>
                     @endforeach

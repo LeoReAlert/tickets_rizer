@@ -26,10 +26,8 @@ Route::middleware('auth')->group(function () {
 Route::resource('vendedores', VendedorController::class)
     ->parameters(['vendedores' => 'vendedor']);
 
-
 //Rotas Tickets
 Route::resource('tickets', TicketController::class);
-
 
 // Rotas para Suporte (gestão de suportes)
 Route::resource('suporte', SuporteController::class);

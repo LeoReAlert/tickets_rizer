@@ -4,21 +4,21 @@
     </x-slot>
 
     <!-- Exibindo alerta para tickets atrasados -->
-    @if($ticketsAtrasados->isNotEmpty())
+    @if ($ticketsAtrasados->isNotEmpty())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong>Atenção!</strong> Existem tickets com status "Atrasado" que precisam ser resolvidos imediatamente.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
 
-    @if($noTickets)
-    <div class="alert alert-warning">
-        Não há tickets cadastrados no sistema.
-    </div>
-@endif
+    @if ($noTickets)
+        <div class="alert alert-warning">
+            Não há tickets cadastrados no sistema.
+        </div>
+    @endif
 
     <!-- Exibindo alerta para tickets com mais de 24 horas -->
-    @if($ticketsAtrasadosMaisDe24Horas->isNotEmpty())
+    @if ($ticketsAtrasadosMaisDe24Horas->isNotEmpty())
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             <strong>Atenção!</strong> Existem tickets com mais de 24 horas que precisam ser resolvidos imediatamente.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -31,9 +31,9 @@
         <a href="{{ route('tickets.create') }}" class="btn btn-primary mb-5">Criar Ticket</a>
 
         <!-- Exibindo Todos os Tickets -->
-        @if($todosTickets->isNotEmpty())
+        @if ($todosTickets->isNotEmpty())
             <h2>Todos os Tickets</h2>
-            <table class="table mt-4">
+            <table class="mt-4 table">
                 <thead>
                     <tr>
                         <th>Assunto</th>
@@ -45,7 +45,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($todosTickets as $ticket)
+                    @foreach ($todosTickets as $ticket)
                         <tr>
                             <td>{{ $ticket->created_at->format('Y/d') }}</td>
                             <td>{{ $ticket->descricao }}</td>
@@ -55,10 +55,11 @@
                             <td>
                                 <a href="{{ route('tickets.show', $ticket) }}" class="btn btn-info">Ver</a>
                                 @role('support')
-                                <a href="{{ route('tickets.edit', $ticket) }}" class="btn btn-warning">Editar</a>
+                                    <a href="{{ route('tickets.edit', $ticket) }}" class="btn btn-warning">Editar</a>
                                 @endrole
                                 @role('support')
-                                    <form action="{{ route('tickets.destroy', $ticket) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('tickets.destroy', $ticket->id) }}" method="POST"
+                                        class="d-inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger">Deletar</button>

@@ -13,7 +13,7 @@ class Ticket extends Model
 
     protected $fillable = ['assunto', 'descricao', 'status', 'vendedor_id', 'suporte_id'];
 
-    
+
     public function vendedor()
     {
         return $this->belongsTo(Vendedor::class, 'vendedor_id');
