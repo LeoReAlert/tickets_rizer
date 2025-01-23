@@ -21,7 +21,7 @@ class TicketRepository
     }
     public function getAllVendedor()
     {
-        $vendedores = Vendedor::where('id', 'vendedor_id')->get();
+        $vendedores = Vendedor::all();
         return $vendedores;
     }
 
@@ -50,63 +50,66 @@ class TicketRepository
     }
 
     public function createTicket(array $data)
-    {
-        DB::beginTransaction();
+{
+    DB::beginTransaction();
 
-        try {
-            \Log::info('Iniciando criação do ticket.');
+    try {
+        \Log::info('Iniciando criação do ticket.');
 
-            $vendedor = Vendedor::find($data['vendedor_id']);
-            \Log::info('Vendedor ID recebido: ' . $data['vendedor_id']);
+        $vendedor = Vendedor::find($data['vendedor_id']);
+        \Log::info('Vendedor ID recebido: ' . $data['vendedor_id']);
 
-            if (!$vendedor) {
-                throw new \Exception('Vendedor não encontrado no sistema.');
-            }
-
-            \Log::info('Vendedor encontrado: ' . $vendedor->id);
-
-            $ticketExistente = Ticket::where('vendedor_id', $vendedor->id)
-                ->whereIn('status', ['Aberto', 'Em andamento'])
-                ->exists();
-
-            if ($ticketExistente) {
-                throw new \Exception('O vendedor já possui um ticket em aberto ou em andamento.');
-            }
-
-            \Log::info('Nenhum ticket em aberto encontrado para o vendedor.');
-
-
-            $suporte = User::role('support')->first();
-
-            if (!$suporte) {
-                throw new \Exception('Nenhum suporte disponível para atribuição.');
-            }
-
-            \Log::info('Suporte encontrado: ' . $suporte->id);
-
-
-            $ticket = Ticket::create([
-                'assunto' => $data['assunto'],
-                'descricao' => $data['descricao'],
-                'status' => $data['status'],
-                'vendedor_id' => $vendedor->id,
-                'suporte_id' => $suporte->id,
-            ]);
-
-            \Log::info('Ticket criado com sucesso. ID: ' . $ticket->id);
-
-
-            $this->atualizarContadoresVendedor($vendedor, $data['status']);
-
-            DB::commit();
-
-            return $ticket;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error('Erro ao criar ticket: ' . $e->getMessage());
-            throw $e;
+        if (!$vendedor) {
+            throw new \Exception('Vendedor não encontrado no sistema.');
         }
+
+        \Log::info('Vendedor encontrado: ' . $vendedor->id);
+
+
+        $ticketExistente = Ticket::where('vendedor_id', $vendedor->id)
+            ->whereIn('status', ['Aberto', 'Em andamento'])
+            ->exists();
+
+        if ($ticketExistente) {
+            throw new \Exception('O vendedor já possui um ticket em aberto ou em andamento.');
+        }
+
+        \Log::info('Nenhum ticket em aberto encontrado para o vendedor.');
+
+
+        $suporte = User::role('support')->first();
+        if (!$suporte) {
+            throw new \Exception('Nenhum suporte disponível para atribuição.');
+        }
+
+        \Log::info('Suporte encontrado: ' . $suporte->id);
+
+
+        $ticket = Ticket::create([
+            'assunto' => $data['assunto'],
+            'descricao' => $data['descricao'],
+            'status' => $data['status'],
+            'vendedor_id' => $vendedor->id,
+            'suporte_id' => $suporte->id,
+        ]);
+
+        \Log::info('Ticket criado com sucesso. ID: ' . $ticket->id);
+
+
+        $this->atualizarContadoresVendedor($vendedor, $data['status']);
+
+
+        DB::commit();
+
+        return $ticket;
+
+    } catch (\Exception $e) {
+
+        DB::rollBack();
+        \Log::error('Erro ao criar ticket: ' . $e->getMessage());
+        throw $e;
     }
+}
 
 
     public function updateTicket(int $ticketId, array $data)
@@ -217,7 +220,7 @@ class TicketRepository
     $ticket->status = 'resolvido';
     $ticket->save();
 
-    $vendedor = Vendedor::where('vendedor_id', $ticket->vendedor_id)->first();
+    $vendedor = Vendedor::where('user_id', $ticket->user_id)->first();
 
     if ($vendedor) {
         $this->atualizarContadoresVendedor($vendedor, $ticket->status);

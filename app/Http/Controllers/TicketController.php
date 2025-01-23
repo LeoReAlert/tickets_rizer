@@ -14,10 +14,10 @@ class TicketController extends Controller
     protected $ticketRepository;
     protected $vendedorRepository;
 
-    public function __construct(TicketRepository $TicketRepository, VendedorRepository $VendedorRepository)
+    public function __construct(TicketRepository $ticketRepository, VendedorRepository $vendedorRepository)
     {
-        $this->ticketRepository = $TicketRepository;
-        $this->vendedorRepository = $VendedorRepository;
+          $this->ticketRepository = $ticketRepository;
+          $this->vendedorRepository = $vendedorRepository;
     }
     public function index()
     {
@@ -51,39 +51,43 @@ class TicketController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'assunto' => 'required|string|max:255',
-            'descricao' => 'required|string',
-            'status' => 'required|string|in:Aberto,Em andamento,Atrasado,Resolvido',
-            'vendedor_id' => 'required|exists:vendedores,id',
+{
+    $validated = $request->validate([
+        'assunto' => 'required|string|max:255',
+        'descricao' => 'required|string',
+        'status' => 'required|string|in:Aberto,Em andamento,Atrasado,Resolvido',
+        'vendedor_id' => 'required|exists:vendedores,id',
+    ]);
+
+    try {
+        $ticket = $this->ticketRepository->createTicket([
+            'assunto' => $validated['assunto'],
+            'descricao' => $validated['descricao'],
+            'status' => $validated['status'],
+            'vendedor_id' => $validated['vendedor_id'],
         ]);
 
-        try {
-            $ticket = $this->ticketRepository->createTicket([
-                'assunto' => $validated['assunto'],
-                'descricao' => $validated['descricao'],
-                'status' => $validated['status'],
-                'vendedor_id' => $validated['vendedor_id'],
-            ]);
+        // Comentando ou removendo o envio de notificações
+        // if ($ticket) {
+        //     $supportUsers = User::role('support')->get();
+        //     foreach ($supportUsers as $user) {
+        //         $user->notify(new NewTicketNotification($ticket));
+        //     }
 
-            if ($ticket) {
-                $supportUsers = User::role('support')->get();
-                foreach ($supportUsers as $user) {
-                    $user->notify(new NewTicketNotification($ticket));
-                }
+        //     return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso e notificação enviada!');
+        // }
 
-                return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso e notificação enviada!');
-            }
-
-            return back()->with('error', 'Ocorreu um erro ao criar o ticket.');
-
-        } catch (\Exception $e) {
-            \Log::error('Erro ao criar ticket: ' . $e->getMessage());
-            return back()->with('error', 'Erro ao criar o ticket: ' . $e->getMessage());
+        if ($ticket) {
+            return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso!');
         }
-    }
 
+        return back()->with('error', 'Ocorreu um erro ao criar o ticket.');
+
+    } catch (\Exception $e) {
+        \Log::error('Erro ao criar ticket: ' . $e->getMessage());
+        return back()->with('error', 'Erro ao criar o ticket: ' . $e->getMessage());
+    }
+}
     public function show($id)
     {
         try {
