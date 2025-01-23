@@ -16,8 +16,8 @@ class TicketController extends Controller
 
     public function __construct(TicketRepository $ticketRepository, VendedorRepository $vendedorRepository)
     {
-          $this->ticketRepository = $ticketRepository;
-          $this->vendedorRepository = $vendedorRepository;
+        $this->ticketRepository = $ticketRepository;
+        $this->vendedorRepository = $vendedorRepository;
     }
     public function index()
     {
@@ -33,15 +33,24 @@ class TicketController extends Controller
             abort(403, 'Acesso negado');
         }
 
+
         $ticketsData = $this->ticketRepository->TicketsAtrasados();
+
 
         $ticketsAtrasados = $ticketsData['ticketsAtrasados'];
         $ticketsAtrasadosMaisDe24Horas = $ticketsData['ticketsAtrasadosMaisDe24Horas'];
         $todosTickets = $ticketsData['todosTickets'];
         $noTickets = $ticketsData['noTickets'];
 
-        return view('admin.tickets.index', compact('ticketsAtrasadosMaisDe24Horas', 'ticketsAtrasados', 'todosTickets', 'noTickets'));
+
+        return view('admin.tickets.index', compact(
+            'ticketsAtrasadosMaisDe24Horas',
+            'ticketsAtrasados',
+            'todosTickets',
+            'noTickets'
+        ));
     }
+
 
     public function create()
     {
@@ -51,51 +60,48 @@ class TicketController extends Controller
     }
 
     public function store(Request $request)
-{
-    $validated = $request->validate([
-        'assunto' => 'required|string|max:255',
-        'descricao' => 'required|string',
-        'status' => 'required|string|in:Aberto,Em andamento,Atrasado,Resolvido',
-        'vendedor_id' => 'required|exists:vendedores,id',
-    ]);
-
-    try {
-        $ticket = $this->ticketRepository->createTicket([
-            'assunto' => $validated['assunto'],
-            'descricao' => $validated['descricao'],
-            'status' => $validated['status'],
-            'vendedor_id' => $validated['vendedor_id'],
+    {
+        $validated = $request->validate([
+            'assunto' => 'required|string|max:255',
+            'descricao' => 'required|string',
+            'status' => 'required|string|in:Aberto,Em andamento,Atrasado,Resolvido',
+            'vendedor_id' => 'required|exists:vendedores,id',
         ]);
 
-        // Comentando ou removendo o envio de notificações
-        // if ($ticket) {
-        //     $supportUsers = User::role('support')->get();
-        //     foreach ($supportUsers as $user) {
-        //         $user->notify(new NewTicketNotification($ticket));
-        //     }
+        try {
+            $ticket = $this->ticketRepository->createTicket([
+                'assunto' => $validated['assunto'],
+                'descricao' => $validated['descricao'],
+                'status' => $validated['status'],
+                'vendedor_id' => $validated['vendedor_id'],
+            ]);
 
-        //     return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso e notificação enviada!');
-        // }
+            // Comentando ou removendo o envio de notificações
+            // if ($ticket) {
+            //     $supportUsers = User::role('support')->get();
+            //     foreach ($supportUsers as $user) {
+            //         $user->notify(new NewTicketNotification($ticket));
+            //     }
 
-        if ($ticket) {
-            return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso!');
+            //     return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso e notificação enviada!');
+            // }
+
+            if ($ticket) {
+                return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso!');
+            }
+
+            return back()->with('error', 'Ocorreu um erro ao criar o ticket.');
+
+        } catch (\Exception $e) {
+            \Log::error('Erro ao criar ticket: ' . $e->getMessage());
+            return back()->with('error', 'Erro ao criar o ticket: ' . $e->getMessage());
         }
-
-        return back()->with('error', 'Ocorreu um erro ao criar o ticket.');
-
-    } catch (\Exception $e) {
-        \Log::error('Erro ao criar ticket: ' . $e->getMessage());
-        return back()->with('error', 'Erro ao criar o ticket: ' . $e->getMessage());
     }
-}
     public function show($id)
     {
         try {
             $ticket = $this->ticketRepository->getTicketWithRelations($id);
 
-            if (!auth()->user()->can('view', $ticket)) {
-                abort(403, 'Você não tem permissão para visualizar este ticket.');
-            }
             return view('admin.tickets.show', compact('ticket'));
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -119,17 +125,17 @@ class TicketController extends Controller
 
 
     public function update(Request $request, $id)
-{
-    try {
-        $data = $request->all();
-        $ticket = $this->ticketRepository->updateTicket($id, $data);
+    {
+        try {
+            $data = $request->all();
+            $ticket = $this->ticketRepository->updateTicket($id, $data);
 
-        return redirect()->route('tickets.index')->with('success', 'Ticket atualizado com sucesso.');
-    } catch (\Exception $e) {
-        \Log::error('Erro ao atualizar ticket: ' . $e->getMessage());
-        return redirect()->back()->with('error', 'Erro ao atualizar o ticket.');
+            return redirect()->route('tickets.index')->with('success', 'Ticket atualizado com sucesso.');
+        } catch (\Exception $e) {
+            \Log::error('Erro ao atualizar ticket: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Erro ao atualizar o ticket.');
+        }
     }
-}
     public function destroy($id)
     {
         $this->ticketRepository->DeleteTicket($id);

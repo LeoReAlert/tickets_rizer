@@ -53,9 +53,9 @@
                             <td>{{ $ticket->vendedor->nome ?? 'Vendedor não atribuído' }}</td>
                             <td>{{ $ticket->suporte->name ?? 'Suporte não atribuído' }}</td>
                             <td>
-                                <a href="{{ route('tickets.show', $ticket) }}" class="btn btn-info">Ver</a>
+                                <a href="{{ route('tickets.show', $ticket->id) }}" class="btn btn-info">Ver</a>
                                 @role('support')
-                                    <a href="{{ route('tickets.edit', $ticket) }}" class="btn btn-warning">Editar</a>
+                                    <a href="{{ route('tickets.edit', $ticket->id) }}" class="btn btn-warning">Editar</a>
                                 @endrole
                                 @role('support')
                                     <form action="{{ route('tickets.destroy', $ticket->id) }}" method="POST"
