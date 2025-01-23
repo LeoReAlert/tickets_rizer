@@ -11,7 +11,7 @@
                     <div class="toast-body">
                         {{ session('success') }}
                     </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    <button type="button" class="btn-close btn-close-white m-auto me-2" data-bs-dismiss="toast"
                         aria-label="Close"></button>
                 </div>
             </div>
@@ -19,19 +19,19 @@
     @endif
 
     @if (session('error'))
-    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
-        <div id="errorToast" class="toast align-items-center text-bg-danger border-0" role="alert"
-            aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body">
-                    {{ session('error') }}
+        <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
+            <div id="errorToast" class="toast align-items-center text-bg-danger border-0" role="alert"
+                aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        {{ session('error') }}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white m-auto me-2" data-bs-dismiss="toast"
+                        aria-label="Close"></button>
                 </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                    aria-label="Close"></button>
             </div>
         </div>
-    </div>
-@endif
+    @endif
 
     <div class="container mt-5">
         <form action="{{ route('tickets.update', $ticket->id) }}" method="POST">
@@ -58,23 +58,28 @@
 
             <div class="mb-3">
                 <label for="status" class="form-label">Status</label>
-                <select class="form-control @error('status') is-invalid @enderror" id="status" name="status" required>
+                <select class="form-control @error('status') is-invalid @enderror" id="status" name="status"
+                    required>
                     <option value="">Selecione o status</option>
-                    <option value="Aberto" {{ old('status', $ticket->status) == 'Aberto' ? 'selected' : '' }}>Aberto</option>
-                    <option value="Em andamento" {{ old('status', $ticket->status) == 'Em andamento' ? 'selected' : '' }}>Em Andamento</option>
-                    <option value="Atrasado" {{ old('status', $ticket->status) == 'Atrasado' ? 'selected' : '' }}>Atrasado</option>
-                    <option value="Resolvido" {{ old('status', $ticket->status) == 'Resolvido' ? 'selected' : '' }}>Resolvido</option>
+                    <option value="Aberto" {{ old('status', $ticket->status) == 'Aberto' ? 'selected' : '' }}>Aberto
+                    </option>
+                    <option value="Em andamento"
+                        {{ old('status', $ticket->status) == 'Em andamento' ? 'selected' : '' }}>Em Andamento</option>
+                    <option value="Atrasado" {{ old('status', $ticket->status) == 'Atrasado' ? 'selected' : '' }}>
+                        Atrasado</option>
+                    <option value="Resolvido" {{ old('status', $ticket->status) == 'Resolvido' ? 'selected' : '' }}>
+                        Resolvido</option>
                 </select>
                 @error('status')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
 
-   
-          <input type="hidden" name="vendedor_id" value="{{ $ticket->vendedor->id }}">
+
+            <input type="hidden" name="vendedor_id" value="{{ $ticket->vendedor->id }}">
             <div class="mb-3">
                 <label for="vendedor_id" class="form-label">Vendedor</label>
-                <input type="text" class="form-control" value="{{ $ticket->vendedor->name }}" readonly>
+                <input type="text" class="form-control" value="{{ $ticket->vendedor->nome }}" readonly>
             </div>
 
 

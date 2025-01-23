@@ -3,19 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Repositories\TicketRepository;
-use App\Models\Vendedor;
 use Illuminate\Http\Request;
 use App\Notifications\NewTicketNotification;
 use App\Models\User;
-use Carbon\Carbon;
+use App\Models\Ticket;
+use App\Repositories\VendedorRepository;
 
 class TicketController extends Controller
 {
     protected $ticketRepository;
+    protected $vendedorRepository;
 
-    public function __construct(TicketRepository $TicketRepository)
+    public function __construct(TicketRepository $TicketRepository, VendedorRepository $VendedorRepository)
     {
         $this->ticketRepository = $TicketRepository;
+        $this->vendedorRepository = $VendedorRepository;
     }
     public function index()
     {
@@ -111,11 +113,13 @@ class TicketController extends Controller
 
     public function update(Request $request, Ticket $ticket)
     {
+
         $validated = $request->validate([
             'assunto' => 'required|string|max:255',
             'descricao' => 'required|string',
             'status' => 'required|string|in:Aberto,Em andamento,Atrasado,Resolvido',
             'vendedor_id' => 'required|exists:users,id',
+            'suporte_id' => 'required|exists:users,id',
         ]);
 
         $user = User::findOrFail($validated['vendedor_id']);
@@ -125,45 +129,18 @@ class TicketController extends Controller
             return back()->with('error', 'O usuário selecionado não é um vendedor.');
         }
 
+        $ticketRepository = app(TicketRepository::class);
 
-        $oldStatus = $ticket->status;
+        $updatedTicket = $ticketRepository->updateTicket($ticket->id, $validated);
 
+        $vendedorRepository = app(VendedorRepository::class);
 
-        $ticket->update([
-            'assunto' => $validated['assunto'],
-            'descricao' => $validated['descricao'],
-            'status' => $validated['status'],
-            'vendedor_id' => $validated['vendedor_id'],
-        ]);
+        $vendedor = $vendedorRepository->GetUniqueVendedor($validated['vendedor_id']);
 
-
-        $vendedor = $user->vendedor;
-
-
-        if ($validated['status'] == 'Aberto') {
-            $vendedor->tickets_abertos += 1;
-        } elseif ($validated['status'] == 'Em andamento') {
-            $vendedor->tickets_em_andamento += 1;
-        } elseif ($validated['status'] == 'Resolvido') {
-            $vendedor->tickets_resolvidos += 1;
-        }
-
-
-        if ($oldStatus == 'Aberto') {
-            $vendedor->tickets_abertos = max(0, $vendedor->tickets_abertos - 1);
-        } elseif ($oldStatus == 'Em andamento') {
-            $vendedor->tickets_em_andamento = max(0, $vendedor->tickets_em_andamento - 1);
-        } elseif ($oldStatus == 'Resolvido') {
-            $vendedor->tickets_resolvidos = max(0, $vendedor->tickets_resolvidos - 1);
-        }
-
-
-        $vendedor->save();
-
+        $this->atualizarContadoresVendedor($vendedor, $validated['status']);
 
         return redirect()->route('tickets.index')->with('success', 'Ticket atualizado com sucesso!');
     }
-
 
     public function destroy($id)
     {

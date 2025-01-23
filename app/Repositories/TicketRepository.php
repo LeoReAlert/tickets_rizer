@@ -109,6 +109,65 @@ class TicketRepository
     }
 
 
+    public function updateTicket(int $ticketId, array $data)
+    {
+        DB::beginTransaction();
+
+        try {
+            \Log::info('Iniciando atualização do ticket ID: ' . $ticketId);
+
+            $ticket = Ticket::find($ticketId);
+            if (!$ticket) {
+                throw new \Exception('Ticket não encontrado.');
+            }
+
+            \Log::info('Ticket encontrado: ' . $ticket->id);
+
+            if (isset($data['vendedor_id'])) {
+                $vendedor = Vendedor::find($data['vendedor_id']);
+                if (!$vendedor) {
+                    throw new \Exception('Vendedor não encontrado no sistema.');
+                }
+
+                \Log::info('Vendedor encontrado: ' . $vendedor->id);
+
+                $ticketExistente = Ticket::where('vendedor_id', $vendedor->id)
+                    ->whereIn('status', ['Aberto', 'Em andamento'])
+                    ->where('id', '<>', $ticket->id)
+                    ->exists();
+
+                if ($ticketExistente) {
+                    throw new \Exception('O vendedor já possui um ticket em aberto ou em andamento.');
+                }
+
+                \Log::info('Nenhum ticket em aberto encontrado para o vendedor.');
+                $ticket->vendedor_id = $vendedor->id;
+            }
+
+            if (isset($data['status']) && $ticket->status !== $data['status']) {
+                \Log::info('Status do ticket alterado de ' . $ticket->status . ' para ' . $data['status']);
+                $this->atualizarContadoresVendedor($ticket->vendedor, $data['status']);
+            }
+
+            $ticket->update([
+                'assunto' => $data['assunto'] ?? $ticket->assunto,
+                'descricao' => $data['descricao'] ?? $ticket->descricao,
+                'status' => $data['status'] ?? $ticket->status,
+                'suporte_id' => $data['suporte_id'] ?? $ticket->suporte_id,
+            ]);
+
+            \Log::info('Ticket atualizado com sucesso. ID: ' . $ticket->id);
+
+            DB::commit();
+
+            return $ticket;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Erro ao atualizar ticket: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
     protected function atualizarContadoresVendedor($vendedor, $status)
     {
 
