@@ -140,6 +140,6 @@ class TicketController extends Controller
     {
         $this->ticketRepository->DeleteTicket($id);
 
-        return redirect()->route('tickets.index')->with('mensagem', 'Ticket deletado com sucesso!');
+        return redirect()->route('tickets.index')->with('success', 'Ticket deletado com sucesso!');
     }
 }
