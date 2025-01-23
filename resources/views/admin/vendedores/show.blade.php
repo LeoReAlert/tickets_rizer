@@ -3,9 +3,9 @@
         <h1>Detalhes do Vendedor</h1>
     </x-slot>
 
-    <div class="container mt-5">
+    <div class="container mb-5 mt-5">
         <div class="col-3">
-      
+
         </div>
 
         <div class="mt-4">
@@ -41,7 +41,7 @@
 
 
             <div class="mt-3">
-  
+
 
             </div>
         </div>

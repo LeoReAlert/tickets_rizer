@@ -3,7 +3,7 @@
         <h1>Cadastro de Vendedor</h1>
     </x-slot>
 
-    <div class="container mt-5 mb-2">
+    <div class="container mb-2 mt-5">
         <h2>Formulário de Cadastro</h2>
 
         <form action="{{ route('vendedores.store') }}" method="POST">
@@ -57,7 +57,7 @@
 
             <div class="mb-3">
                 <label for="status" class="form-label">Status</label>
-                <select class="form-select @error('status') is-invalid @enderror" id="status" name="status"
+                <select class="@error('status') is-invalid @enderror form-select" id="status" name="status"
                     required>
                     <option value="Ativo" {{ old('status') == 'Ativo' ? 'selected' : '' }}>Ativo</option>
                     <option value="Inativo" {{ old('status') == 'Inativo' ? 'selected' : '' }}>Inativo</option>

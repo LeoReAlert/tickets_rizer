@@ -34,9 +34,9 @@
                 <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">Sistema de ticker Rizer</h1>
                 <p class="lead">Conte com o apoio do nosso time para construir o melhor sistema para seu negócio. 100%
                     na nuvem.</p>
-                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-                    <button type="button" class="btn btn-primary btn-lg px-4 me-md-2">Primary</button>
-                    <button type="button" class="btn btn-outline-secondary btn-lg px-4">Default</button>
+                <div class="d-grid d-md-flex justify-content-md-start gap-2">
+                    <button type="button" class="btn btn-primary btn-lg me-md-2 px-4">Dúvidas</button>
+                    <button type="button" class="btn btn-outline-secondary btn-lg px-4">Contato</button>
                 </div>
             </div>
         </div>

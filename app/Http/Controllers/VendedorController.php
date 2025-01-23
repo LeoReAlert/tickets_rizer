@@ -22,7 +22,7 @@ class VendedorController extends Controller
               ->orWhere('email', 'like', '%' . $searchTerm . '%');
     }
 
-    $vendedores = $query->paginate(10);
+    $vendedores = $query->paginate(3);
 
     return view('admin.vendedores.index', compact('vendedores'));
 }

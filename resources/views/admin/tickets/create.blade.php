@@ -61,13 +61,17 @@
                     <select class="form-control @error('status') is-invalid @enderror" id="status" name="status"
                         required>
                         <option value="">Selecione o status</option>
-                        <option value="Aberto" {{ old('status') == 'Aberto' ? 'selected' : '' }}>Aberto</option>
-                        <option value="Em andamento" {{ old('status') == 'Em andamento' ? 'selected' : '' }}>Em
-                            Andamento
-                        </option>
-                        <option value="Atrasado" {{ old('status') == 'Atrasado' ? 'selected' : '' }}>Atrasado</option>
-                        <option value="Resolvido" {{ old('status') == 'Resolvido' ? 'selected' : '' }}>Resolvido
-                        </option>
+                        @role(['support', 'vendedor', 'web'])
+                            <option value="Aberto" {{ old('status') == 'Aberto' ? 'selected' : '' }}>Aberto</option>
+                        @endrole
+                        @role('support')
+                            <option value="Em andamento" {{ old('status') == 'Em andamento' ? 'selected' : '' }}>Em
+                                Andamento
+                            </option>
+                            <option value="Atrasado" {{ old('status') == 'Atrasado' ? 'selected' : '' }}>Atrasado</option>
+                            <option value="Resolvido" {{ old('status') == 'Resolvido' ? 'selected' : '' }}>Resolvido
+                            </option>
+                        @endrole
                     </select>
                     @error('status')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -75,7 +79,12 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="vendedor_id" class="form-label">Vendedor</label>
+                    @role('support')
+                        <label for="vendedor_id" class="form-label">Vendedor</label>
+                    @endrole
+                    @role('vendedor')
+                        <label for="vendedor_id" class="form-label">Seu usuário selecione aqui:</label>
+                    @endrole
                     <select class="form-control @error('vendedor_id') is-invalid @enderror" id="vendedor_id"
                         name="vendedor_id" required>
                         <option value="">Selecione o vendedor</option>

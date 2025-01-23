@@ -40,7 +40,7 @@ class TicketRepository
             ->where('created_at', '<', Carbon::now()->subHours(24))
             ->paginate(10);
 
-        $todosTickets = $ticketsQuery->paginate(10);
+        $todosTickets = $ticketsQuery->paginate(2);
 
         $noTickets = $todosTickets->isEmpty() && $ticketsAtrasados->isEmpty() && $ticketsAtrasadosMaisDe24Horas->isEmpty();
 
