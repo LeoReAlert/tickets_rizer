@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>Rizer - Tickets</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -33,27 +33,27 @@
                         <div class="toast-body">
                             {{ session('success') }}
                         </div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                        <button type="button" class="btn-close btn-close-white m-auto me-2" data-bs-dismiss="toast"
                             aria-label="Close"></button>
                     </div>
                 </div>
             </div>
         @endif
 
-     @if (session('error'))
-    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
-        <div id="errorToast" class="toast align-items-center text-bg-danger border-0" role="alert"
-            aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body">
-                    {{ session('error') }}
+        @if (session('error'))
+            <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
+                <div id="errorToast" class="toast align-items-center text-bg-danger border-0" role="alert"
+                    aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            {{ session('error') }}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white m-auto me-2" data-bs-dismiss="toast"
+                            aria-label="Close"></button>
+                    </div>
                 </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                    aria-label="Close"></button>
             </div>
-        </div>
-    </div>
-@endif
+        @endif
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {
@@ -75,7 +75,7 @@
         <!-- Page Heading -->
         @if (isset($header))
             <header class="bg-white shadow">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
                     {{ $header }}
                 </div>
             </header>
