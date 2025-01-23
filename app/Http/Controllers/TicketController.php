@@ -114,7 +114,7 @@ class TicketController extends Controller
         try {
             $ticket = $this->ticketRepository->getTicketById($id);
 
-            $vendedores = $this->ticketRepository->getVendedores($id);
+            $vendedores = $this->ticketRepository->getVendedores();
 
             return view('admin.tickets.edit', compact('ticket', 'vendedores'));
         } catch (\Exception $e) {

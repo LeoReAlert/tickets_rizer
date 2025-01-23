@@ -206,9 +206,9 @@ class TicketRepository
         return $ticket;
     }
 
-    public function getVendedores($id)
+    public function getVendedores()
     {
-        return Vendedor::findOrFail($id);
+        return Vendedor::all();
     }
 
     public function getTicketById($id)
