@@ -50,7 +50,7 @@
                             <td>{{ $ticket->created_at->format('Y/d') }}</td>
                             <td>{{ $ticket->descricao }}</td>
                             <td>{{ $ticket->status }}</td>
-                            <td>{{ $ticket->vendedor->name ?? 'Vendedor não atribuído' }}</td>
+                            <td>{{ $ticket->vendedor->nome ?? 'Vendedor não atribuído' }}</td>
                             <td>{{ $ticket->suporte->name ?? 'Suporte não atribuído' }}</td>
                             <td>
                                 <a href="{{ route('tickets.show', $ticket) }}" class="btn btn-info">Ver</a>

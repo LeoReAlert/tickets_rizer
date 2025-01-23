@@ -12,7 +12,8 @@ class TicketRepository
 {
     public function GetAllTickets()
     {
-        $tickets = Ticket::all();
+        $tickets = Ticket::where('id', 'vendedor_id')->get();
+        return $tickets;
     }
     public function GetUniqueTicket($user_id)
     {
@@ -20,15 +21,13 @@ class TicketRepository
     }
     public function getAllVendedor()
     {
-        $vendedores = Vendedor::all();
-
+        $vendedores = Vendedor::where('id', 'vendedor_id')->get();
         return $vendedores;
     }
 
     public function TicketsAtrasados()
     {
         $ticketsQuery = Ticket::with('vendedor');
-
         $ticketsAtrasados = (clone $ticketsQuery)
             ->where('status', 'Atrasado')
             ->paginate(10);
