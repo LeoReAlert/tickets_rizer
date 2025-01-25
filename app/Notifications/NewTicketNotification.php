@@ -7,16 +7,23 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewTicketNotification  extends Notification
+class NewTicketNotification extends Notification
 {
     use Queueable;
 
+    protected $ticket;
+    protected $recipientType;
+
     /**
      * Create a new notification instance.
+     *
+     * @param mixed $ticket
+     * @param string $recipientType ('vendedor' ou 'suporte')
      */
-    public function __construct()
+    public function __construct($ticket, $recipientType)
     {
-        //
+        $this->ticket = $ticket;
+        $this->recipientType = $recipientType;
     }
 
     /**
@@ -34,10 +41,27 @@ class NewTicketNotification  extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-                    ->line('Novo ticket foi criado com sucesso.')
-                    ->action('A tickets em aberto acesso o sistema', url('/'))
-                    ->line('Obrigado por usar nossa aplicação!');
+        $mail = new MailMessage;
+
+        if ($this->recipientType === 'vendedor') {
+            $mail->subject('Novo Ticket Criado')
+                 ->greeting('Olá ' . $notifiable->name)
+                 ->line('Seu ticket foi criado com os seguintes detalhes:')
+                 ->line('Assunto: ' . $this->ticket->assunto)
+                 ->line('Descrição: ' . $this->ticket->descricao)
+                 ->line('Status: ' . $this->ticket->status)
+                 ->action('Visualizar Ticket', url('/tickets/' . $this->ticket->id));
+        } elseif ($this->recipientType === 'support') {
+            $mail->subject('Novo Ticket Atribuído a Você')
+                 ->greeting('Olá ' . $notifiable->name)
+                 ->line('Um novo ticket foi atribuído a você com os seguintes detalhes:')
+                 ->line('Assunto: ' . $this->ticket->assunto)
+                 ->line('Descrição: ' . $this->ticket->descricao)
+                 ->line('Status: ' . $this->ticket->status)
+                 ->action('Visualizar Ticket', url('/tickets/' . $this->ticket->id));
+        }
+
+        return $mail->line('Obrigado por usar nossa aplicação!');
     }
 
     /**
@@ -48,7 +72,9 @@ class NewTicketNotification  extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            //
+            'ticket_id' => $this->ticket->id,
+            'assunto' => $this->ticket->assunto,
+            'descricao' => $this->ticket->descricao,
         ];
     }
 }

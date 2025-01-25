@@ -101,6 +101,9 @@ class TicketRepository
 
             $this->atualizarContadoresVendedor($vendedor, $data['status']);
 
+            $vendedor->notify(new NewTicketNotification($ticket, 'vendedor'));
+            $suporte->notify(new NewTicketNotification($ticket, 'support'));
+
 
             DB::commit();
 

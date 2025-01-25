@@ -76,16 +76,6 @@ class TicketController extends Controller
                 'vendedor_id' => $validated['vendedor_id'],
             ]);
 
-            // Comentando ou removendo o envio de notificações
-            // if ($ticket) {
-            //     $supportUsers = User::role('support')->get();
-            //     foreach ($supportUsers as $user) {
-            //         $user->notify(new NewTicketNotification($ticket));
-            //     }
-
-            //     return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso e notificação enviada!');
-            // }
-
             if ($ticket) {
                 return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso!');
             }
