@@ -20,10 +20,10 @@ class NewTicketNotification extends Notification
      * @param mixed $ticket
      * @param string $recipientType ('vendedor' ou 'suporte')
      */
-    public function __construct($ticket, $recipientType)
+    public function __construct($ticket, $role)
     {
         $this->ticket = $ticket;
-        $this->recipientType = $recipientType;
+        $this->role = $role;
     }
 
     /**
@@ -43,23 +43,26 @@ class NewTicketNotification extends Notification
     {
         $mail = new MailMessage;
 
-        if ($this->recipientType === 'vendedor') {
+        if ($notifiable->hasRole('vendedor')) {
             $mail->subject('Novo Ticket Criado')
-                 ->greeting('Olá ' . $notifiable->name)
-                 ->line('Seu ticket foi criado com os seguintes detalhes:')
-                 ->line('Assunto: ' . $this->ticket->assunto)
-                 ->line('Descrição: ' . $this->ticket->descricao)
-                 ->line('Status: ' . $this->ticket->status)
-                 ->action('Visualizar Ticket', url('/tickets/' . $this->ticket->id));
-        } elseif ($this->recipientType === 'support') {
+                 ->greeting('Olá, ' . $notifiable->name . '!')
+                 ->line('Seu ticket foi criado com sucesso e contém os seguintes detalhes:')
+                 ->line('**Assunto:** ' . $this->ticket->assunto)
+                 ->line('**Descrição:** ' . $this->ticket->descricao)
+                 ->line('**Status:** ' . $this->ticket->status)
+                 ->action('Visualizar Ticket', url('/tickets/' . $this->ticket->id))
+                 ->line('Obrigado por usar nosso sistema. Estamos à disposição para ajudá-lo!');
+        } elseif ($notifiable->hasRole('support')) {
             $mail->subject('Novo Ticket Atribuído a Você')
-                 ->greeting('Olá ' . $notifiable->name)
-                 ->line('Um novo ticket foi atribuído a você com os seguintes detalhes:')
-                 ->line('Assunto: ' . $this->ticket->assunto)
-                 ->line('Descrição: ' . $this->ticket->descricao)
-                 ->line('Status: ' . $this->ticket->status)
-                 ->action('Visualizar Ticket', url('/tickets/' . $this->ticket->id));
+                 ->greeting('Olá, ' . $notifiable->name . '!')
+                 ->line('Um novo ticket foi atribuído a você. Confira os detalhes abaixo:')
+                 ->line('**Assunto:** ' . $this->ticket->assunto)
+                 ->line('**Descrição:** ' . $this->ticket->descricao)
+                 ->line('**Status:** ' . $this->ticket->status)
+                 ->action('Gerenciar Ticket', url('/tickets/' . $this->ticket->id))
+                 ->line('Agradecemos pela sua dedicação e prontidão em resolver este ticket.');
         }
+        
 
         return $mail->line('Obrigado por usar nossa aplicação!');
     }

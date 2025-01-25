@@ -101,9 +101,11 @@ class TicketRepository
 
             $this->atualizarContadoresVendedor($vendedor, $data['status']);
 
-            $vendedor->notify(new NewTicketNotification($ticket, 'vendedor'));
-            $suporte->notify(new NewTicketNotification($ticket, 'support'));
-
+            if ($user->hasRole('vendedor')) {
+                $user->notify(new NewTicketNotification($ticket, 'vendedor'));
+            } elseif ($user->hasRole('support')) {
+                $user->notify(new NewTicketNotification($ticket, 'support'));
+            }
 
             DB::commit();
 
