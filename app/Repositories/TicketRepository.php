@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Notifications\NewTicketNotification;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class TicketRepository
 {
@@ -103,24 +104,24 @@ class TicketRepository
 
             $this->atualizarContadoresVendedor($vendedor, $data['status']);
 
-         
-            $user = Auth::user(); 
+
+            $user = Auth::user();
 
             if (!$user) {
                 throw new \Exception('Usuário não encontrado no sistema.');
             }
-            
-          
+
+
             if ($user->hasRole('vendedor')) {
-            
+
                 $user->notify(new NewTicketNotification($ticket, 'vendedor'));
             }
-            
-         
+
+
             if ($user->hasRole('support')) {
                 $user->notify(new NewTicketNotification($ticket, 'support'));
             }
-            
+
             $vendedor = User::find($ticket->vendedor_id);
             if ($vendedor) {
                 $vendedor->notify(new NewTicketNotification($ticket, 'vendedor'));

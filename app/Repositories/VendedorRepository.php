@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Vendedor;
+use Illuminate\Support\Facades\Log;
 
 class VendedorRepository{
   public function GetAllVendedor(){

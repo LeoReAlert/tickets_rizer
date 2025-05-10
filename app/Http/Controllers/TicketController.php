@@ -4,10 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Repositories\TicketRepository;
 use Illuminate\Http\Request;
-use App\Notifications\NewTicketNotification;
-use App\Models\User;
-use App\Models\Ticket;
 use App\Repositories\VendedorRepository;
+use Illuminate\Support\Facades\Log;
 
 class TicketController extends Controller
 {
@@ -77,7 +75,7 @@ class TicketController extends Controller
             ]);
 
             if ($ticket) {
-                return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso!');
+                return back()('tickets.index')->with('success', 'Ticket criado com sucesso!');
             }
 
             return back()->with('error', 'Ocorreu um erro ao criar o ticket.');
