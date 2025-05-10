@@ -22,16 +22,6 @@ class TicketController extends Controller
         $user = auth()->user();
 
         $ticketsQuery = $this->ticketRepository->getAllVendedor();
-
-        if ($user->hasRole('vendedor') || $user->hasRole('support')) {
-            if ($user->hasRole('vendedor')) {
-                $ticketsQuery->where('vendedor_id', $user->id);
-            }
-        } else {
-            abort(403, 'Acesso negado');
-        }
-
-
         $ticketsData = $this->ticketRepository->TicketsAtrasados();
 
 
@@ -57,8 +47,9 @@ class TicketController extends Controller
         return view('admin.tickets.create', compact('vendedores'));
     }
 
-    public function store(Request $request)
+     public function store(Request $request)
     {
+
         $validated = $request->validate([
             'assunto' => 'required|string|max:255',
             'descricao' => 'required|string',
@@ -67,6 +58,7 @@ class TicketController extends Controller
         ]);
 
         try {
+
             $ticket = $this->ticketRepository->createTicket([
                 'assunto' => $validated['assunto'],
                 'descricao' => $validated['descricao'],
@@ -74,8 +66,9 @@ class TicketController extends Controller
                 'vendedor_id' => $validated['vendedor_id'],
             ]);
 
+
             if ($ticket) {
-                return back()('tickets.index')->with('success', 'Ticket criado com sucesso!');
+                return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso!');
             }
 
             return back()->with('error', 'Ocorreu um erro ao criar o ticket.');
@@ -85,6 +78,8 @@ class TicketController extends Controller
             return back()->with('error', 'Erro ao criar o ticket: ' . $e->getMessage());
         }
     }
+
+
     public function show($id)
     {
         try {
@@ -110,20 +105,29 @@ class TicketController extends Controller
         }
     }
 
-
-
     public function update(Request $request, $id)
     {
+
+        $validated = $request->validate([
+            'assunto' => 'required|string|max:255',
+            'descricao' => 'required|string',
+            'status' => 'required|string|in:Aberto,Em andamento,Atrasado,Resolvido',
+            'vendedor_id' => 'required|exists:vendedores,id',
+        ]);
+
         try {
-            $data = $request->all();
-            $ticket = $this->ticketRepository->updateTicket($id, $data);
+
+            $ticket = $this->ticketRepository->updateTicket($id, $validated);
 
             return redirect()->route('tickets.index')->with('success', 'Ticket atualizado com sucesso.');
         } catch (\Exception $e) {
-            \Log::error('Erro ao atualizar ticket: ' . $e->getMessage());
+
+            \Log::error('Erro ao atualizar ticket ID ' . $id . ': ' . $e->getMessage());
+
             return redirect()->back()->with('error', 'Erro ao atualizar o ticket.');
         }
     }
+
     public function destroy($id)
     {
         $this->ticketRepository->DeleteTicket($id);
