@@ -47,7 +47,7 @@ class TicketController extends Controller
         return view('admin.tickets.create', compact('vendedores'));
     }
 
-     public function store(Request $request)
+    public function store(Request $request)
     {
 
         $validated = $request->validate([
@@ -71,11 +71,11 @@ class TicketController extends Controller
                 return redirect()->route('tickets.index')->with('success', 'Ticket criado com sucesso!');
             }
 
-            return back()->with('error', 'Ocorreu um erro ao criar o ticket.');
+            return redirect()->route('tickets.index')->with('error', 'Ocorreu um erro ao criar o ticket.');
 
         } catch (\Exception $e) {
             \Log::error('Erro ao criar ticket: ' . $e->getMessage());
-            return back()->with('error', 'Erro ao criar o ticket: ' . $e->getMessage());
+            return redirect()->route('tickets.index')->with('error', 'Erro ao criar o ticket: ' . $e->getMessage());
         }
     }
 

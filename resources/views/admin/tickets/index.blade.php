@@ -2,6 +2,11 @@
     <x-slot name="header">
         <h1>Tickets</h1>
     </x-slot>
+    @if (session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
     <div class="container mb-2 mt-5">
         <!-- Exibindo alerta para tickets atrasados -->
         @if ($ticketsAtrasados->isNotEmpty())
